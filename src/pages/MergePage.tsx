@@ -6,12 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import ToolPageLayout from "@/components/ToolPageLayout";
 import FileDropZone from "@/components/FileDropZone";
+import PdfPageThumbnail from "@/components/PdfPageThumbnail";
 import { toast } from "sonner";
 
 interface PdfFile {
   file: File;
   id: string;
   pageCount: number | null;
+  bytes: ArrayBuffer;
 }
 
 const MergePage = () => {
@@ -22,14 +24,14 @@ const MergePage = () => {
     const pdfFiles: PdfFile[] = [];
     for (const file of newFiles) {
       let pageCount: number | null = null;
+      const buffer = await file.arrayBuffer();
       try {
-        const buffer = await file.arrayBuffer();
         const pdf = await PDFDocument.load(buffer, { ignoreEncryption: true });
         pageCount = pdf.getPageCount();
       } catch {
         pageCount = null;
       }
-      pdfFiles.push({ file, id: crypto.randomUUID(), pageCount });
+      pdfFiles.push({ file, id: crypto.randomUUID(), pageCount, bytes: buffer });
     }
     setFiles((prev) => [...prev, ...pdfFiles]);
   }, []);
@@ -54,9 +56,8 @@ const MergePage = () => {
     setProcessing(true);
     try {
       const mergedPdf = await PDFDocument.create();
-      for (const { file } of files) {
-        const buffer = await file.arrayBuffer();
-        const pdf = await PDFDocument.load(buffer, { ignoreEncryption: true });
+      for (const { bytes } of files) {
+        const pdf = await PDFDocument.load(bytes, { ignoreEncryption: true });
         const pages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
         pages.forEach((page) => mergedPdf.addPage(page));
       }
@@ -70,6 +71,8 @@ const MergePage = () => {
       setProcessing(false);
     }
   };
+
+  const totalPages = files.reduce((s, f) => s + (f.pageCount ?? 0), 0);
 
   return (
     <ToolPageLayout
@@ -86,39 +89,44 @@ const MergePage = () => {
       />
 
       {files.length > 0 && (
-        <Card>
-          <CardContent className="divide-y p-0">
-            {files.map((f, i) => (
-              <div key={f.id} className="flex items-center gap-3 px-4 py-3">
-                <GripVertical className="h-4 w-4 shrink-0 text-muted-foreground" />
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-tool-merge/10 text-tool-merge">
-                  <FileText className="h-5 w-5" />
+        <>
+          <div className="flex items-center justify-between text-sm text-muted-foreground px-1">
+            <span>{files.length} files · {totalPages} total pages</span>
+          </div>
+          <Card>
+            <CardContent className="divide-y p-0">
+              {files.map((f, i) => (
+                <div key={f.id} className="flex items-center gap-3 px-4 py-3">
+                  <GripVertical className="h-4 w-4 shrink-0 text-muted-foreground" />
+                  <div className="shrink-0">
+                    <PdfPageThumbnail fileBytes={f.bytes} pageIndex={0} width={48} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium">{f.file.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {f.pageCount != null ? `${f.pageCount} pages` : "Loading…"} ·{" "}
+                      {(f.file.size / 1024).toFixed(0)} KB
+                    </p>
+                  </div>
+                  <div className="flex gap-1">
+                    <Button variant="ghost" size="icon" className="h-8 w-8 min-h-[44px]" onClick={() => moveFile(i, -1)} disabled={i === 0}>↑</Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 min-h-[44px]" onClick={() => moveFile(i, 1)} disabled={i === files.length - 1}>↓</Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 min-h-[44px] text-destructive" onClick={() => removeFile(f.id)}>
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium">{f.file.name}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {f.pageCount != null ? `${f.pageCount} pages` : "Loading…"} ·{" "}
-                    {(f.file.size / 1024).toFixed(0)} KB
-                  </p>
-                </div>
-                <div className="flex gap-1">
-                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => moveFile(i, -1)} disabled={i === 0}>↑</Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => moveFile(i, 1)} disabled={i === files.length - 1}>↓</Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => removeFile(f.id)}>
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+              ))}
+            </CardContent>
+          </Card>
+        </>
       )}
 
       {files.length > 0 && (
         <Button
           onClick={handleMerge}
           disabled={processing || files.length < 2}
-          className="w-full"
+          className="w-full min-h-[44px]"
           size="lg"
         >
           {processing ? "Merging…" : `Merge ${files.length} Files`}

@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ImageIcon } from "lucide-react";
 import ToolPageLayout from "@/components/ToolPageLayout";
 import FileDropZone from "@/components/FileDropZone";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const formats = [
@@ -13,8 +14,16 @@ const formats = [
 
 const ConvertImagePage = () => {
   const [file, setFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
   const [format, setFormat] = useState("image/png");
   const [processing, setProcessing] = useState(false);
+
+  useEffect(() => {
+    if (!file) { setPreview(null); return; }
+    const url = URL.createObjectURL(file);
+    setPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [file]);
 
   const handleConvert = async () => {
     if (!file) return;
@@ -52,7 +61,22 @@ const ConvertImagePage = () => {
         <FileDropZone onFiles={(f) => setFile(f[0])} accept=".png,.jpg,.jpeg,.webp,.bmp,.gif" label="Drop an image here" />
       ) : (
         <div className="space-y-4">
-          <p className="text-sm">Selected: <strong>{file.name}</strong></p>
+          <Card>
+            <CardContent className="p-4 flex items-center justify-between">
+              <div className="min-w-0">
+                <p className="text-sm font-medium truncate">{file.name}</p>
+                <p className="text-xs text-muted-foreground">{(file.size / 1024).toFixed(0)} KB</p>
+              </div>
+              <Button variant="ghost" size="sm" className="min-h-[44px]" onClick={() => setFile(null)}>Change</Button>
+            </CardContent>
+          </Card>
+
+          {preview && (
+            <div className="rounded-lg border bg-muted/30 p-2 flex items-center justify-center overflow-hidden" style={{ maxHeight: "300px" }}>
+              <img src={preview} alt="Preview" className="max-w-full max-h-[280px] object-contain rounded" />
+            </div>
+          )}
+
           <div>
             <label className="text-sm font-medium mb-1.5 block">Output Format</label>
             <Select value={format} onValueChange={setFormat}>
@@ -63,8 +87,7 @@ const ConvertImagePage = () => {
             </Select>
           </div>
           <div className="flex gap-2">
-            <Button onClick={handleConvert} disabled={processing}>{processing ? "Converting…" : "Convert & Download"}</Button>
-            <Button variant="outline" onClick={() => setFile(null)}>Clear</Button>
+            <Button onClick={handleConvert} disabled={processing} className="flex-1 min-h-[44px]" size="lg">{processing ? "Converting…" : "Convert & Download"}</Button>
           </div>
         </div>
       )}

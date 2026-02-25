@@ -11,9 +11,10 @@ interface ToolPageLayoutProps {
   accentColor: string;
   icon: React.ReactNode;
   children: React.ReactNode;
+  wide?: boolean;
 }
 
-const ToolPageLayout = ({ title, description, accentColor, icon, children }: ToolPageLayoutProps) => {
+const ToolPageLayout = ({ title, description, accentColor, icon, children, wide }: ToolPageLayoutProps) => {
   useEffect(() => {
     document.title = `${title} — Free Online PDF Tool | PDF Tools`;
     const meta = document.querySelector('meta[name="description"]');
@@ -24,7 +25,7 @@ const ToolPageLayout = ({ title, description, accentColor, icon, children }: Too
     <div className="flex min-h-screen flex-col">
       <Navbar />
       <main className="flex-1">
-        <div className="container mx-auto max-w-2xl px-4 py-10">
+        <div className={`container mx-auto ${wide ? "max-w-4xl" : "max-w-2xl"} px-4 py-10`}>
           <Link to="/">
             <Button variant="ghost" size="sm" className="mb-6 -ml-2 gap-1.5 text-muted-foreground hover:text-foreground text-[13px]">
               <ArrowLeft className="h-3.5 w-3.5" /> All tools
