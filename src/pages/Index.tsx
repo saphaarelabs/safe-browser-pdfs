@@ -60,6 +60,19 @@ const tools = [
   // Utility (2)
   { title: "Compare PDFs", desc: "Compare two PDFs and highlight differences.", icon: GitCompare, path: "/compare", color: "hsl(200, 70%, 50%)", category: "utility" },
   { title: "PDF Page Size", desc: "Analyze page dimensions of your PDF.", icon: Ruler, path: "/pdf-page-size", color: "hsl(190, 60%, 45%)", category: "utility" },
+  // Phase 4 — new tools (12)
+  { title: "PDF to Markdown", desc: "Convert PDF text to Markdown format.", icon: FileText, path: "/pdf-to-markdown", color: "hsl(220, 70%, 55%)", category: "convert" },
+  { title: "Markdown to PDF", desc: "Convert Markdown text to PDF.", icon: FileType, path: "/markdown-to-pdf", color: "hsl(250, 60%, 55%)", category: "convert" },
+  { title: "Add Header/Footer", desc: "Add custom text headers and footers.", icon: Layers, path: "/header-footer", color: "hsl(170, 55%, 45%)", category: "edit" },
+  { title: "PDF to XML", desc: "Extract PDF text into structured XML.", icon: Code, path: "/pdf-to-xml", color: "hsl(30, 70%, 50%)", category: "convert" },
+  { title: "Duplicate Pages", desc: "Duplicate specific pages N times.", icon: Layers, path: "/duplicate-pages", color: "hsl(280, 60%, 55%)", category: "edit" },
+  { title: "Add QR Code", desc: "Embed a QR code on every PDF page.", icon: Hash, path: "/add-qr-code", color: "hsl(200, 65%, 50%)", category: "edit" },
+  { title: "PDF to TIFF", desc: "Convert PDF pages to images in a ZIP.", icon: Image, path: "/pdf-to-tiff", color: "hsl(310, 55%, 50%)", category: "convert" },
+  { title: "Rotate Image", desc: "Rotate images by 90°, 180°, or 270°.", icon: RotateCw, path: "/rotate-image", color: "hsl(340, 65%, 55%)", category: "image" },
+  { title: "Flip Image", desc: "Flip images horizontally or vertically.", icon: ImageIcon, path: "/flip-image", color: "hsl(190, 60%, 50%)", category: "image" },
+  { title: "Image to Base64", desc: "Convert images to Base64-encoded strings.", icon: Code2, path: "/image-to-base64", color: "hsl(270, 55%, 55%)", category: "image" },
+  { title: "Batch Process", desc: "Apply operations to multiple PDFs at once.", icon: Upload, path: "/batch", color: "hsl(150, 55%, 45%)", category: "utility" },
+  { title: "PDF Diff", desc: "Compare text content of two PDFs.", icon: GitCompare, path: "/pdf-diff", color: "hsl(35, 70%, 50%)", category: "utility" },
 ];
 
 const categories = [
@@ -98,7 +111,7 @@ const comparison = [
 ];
 
 const howItWorks = [
-  { step: "1", title: "Choose a tool", desc: "Pick from 38 free tools — editing, converting, images, and more." },
+  { step: "1", title: "Choose a tool", desc: "Pick from 50 free tools — editing, converting, images, and more." },
   { step: "2", title: "Upload your file", desc: "Drag & drop or browse. Your file stays on your device — nothing is uploaded." },
   { step: "3", title: "Download the result", desc: "Processed instantly in your browser. Download and you're done." },
 ];
@@ -114,7 +127,7 @@ const Index = () => {
   });
 
   useEffect(() => {
-    document.title = "PDF Tools — 38 Free Online PDF Tools | Edit, Convert & More";
+    document.title = "PDF Tools — 50 Free Online PDF Tools | Edit, Convert & More";
   }, []);
 
   return (
