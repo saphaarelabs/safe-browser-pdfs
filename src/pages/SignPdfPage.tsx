@@ -1,60 +1,67 @@
-import { useState, useCallback } from "react";
-import { FileSignature, Download } from "lucide-react";
-import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
+import { useState, useCallback, useRef } from "react";
+import { FileSignature, Download, Move } from "lucide-react";
+import { PDFDocument } from "pdf-lib";
 import { saveAs } from "file-saver";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
 import ToolPageLayout from "@/components/ToolPageLayout";
 import FileDropZone from "@/components/FileDropZone";
+import PdfViewer from "@/components/PdfViewer";
+import SignaturePad from "@/components/SignaturePad";
 import { toast } from "sonner";
-
-type Position = "bottom-right" | "bottom-left" | "bottom-center";
 
 const SignPdfPage = () => {
   const [file, setFile] = useState<File | null>(null);
-  const [signText, setSignText] = useState("");
-  const [fontSize, setFontSize] = useState(14);
-  const [position, setPosition] = useState<Position>("bottom-right");
+  const [fileBytes, setFileBytes] = useState<ArrayBuffer | null>(null);
+  const [sigDataUrl, setSigDataUrl] = useState<string | null>(null);
+  const [sigPos, setSigPos] = useState<{ x: number; y: number }>({ x: 0.7, y: 0.1 }); // normalized 0-1
+  const [sigScale, setSigScale] = useState(0.2); // fraction of page width
+  const [currentPage, setCurrentPage] = useState(0);
   const [allPages, setAllPages] = useState(false);
   const [processing, setProcessing] = useState(false);
+  const [pageCount, setPageCount] = useState(0);
 
   const handleFiles = useCallback(async (files: File[]) => {
-    setFile(files[0]);
+    const f = files[0];
+    setFile(f);
+    const bytes = await f.arrayBuffer();
+    setFileBytes(bytes);
+    const pdf = await PDFDocument.load(bytes, { ignoreEncryption: true });
+    setPageCount(pdf.getPageCount());
+  }, []);
+
+  const handleCanvasClick = useCallback((x: number, y: number, pw: number, ph: number) => {
+    setSigPos({ x: x / pw, y: 1 - y / ph }); // pdf-lib uses bottom-left origin
   }, []);
 
   const handleSign = async () => {
-    if (!file || !signText.trim()) {
-      toast.error("Please enter signature text.");
+    if (!file || !fileBytes || !sigDataUrl) {
+      toast.error("Please create a signature first.");
       return;
     }
     setProcessing(true);
     try {
-      const buffer = await file.arrayBuffer();
-      const pdf = await PDFDocument.load(buffer, { ignoreEncryption: true });
-      const font = await pdf.embedFont(StandardFonts.Courier);
+      const pdf = await PDFDocument.load(fileBytes, { ignoreEncryption: true });
+
+      // Fetch the signature image
+      const sigResponse = await fetch(sigDataUrl);
+      const sigBytes = await sigResponse.arrayBuffer();
+      const sigImg = await pdf.embedPng(new Uint8Array(sigBytes));
+
       const pages = pdf.getPages();
-      const pagesToSign = allPages ? pages : [pages[pages.length - 1]];
+      const pagesToSign = allPages ? pages : [pages[currentPage] || pages[pages.length - 1]];
 
       pagesToSign.forEach((page) => {
         const { width, height } = page.getSize();
-        const textWidth = font.widthOfTextAtSize(signText, fontSize);
+        const sigW = width * sigScale;
+        const sigH = (sigImg.height / sigImg.width) * sigW;
+        const x = Math.max(0, Math.min(width - sigW, sigPos.x * width - sigW / 2));
+        const y = Math.max(0, Math.min(height - sigH, sigPos.y * height - sigH / 2));
 
-        let x: number;
-        if (position === "bottom-right") x = width - textWidth - 40;
-        else if (position === "bottom-left") x = 40;
-        else x = (width - textWidth) / 2;
-
-        page.drawText(signText, {
-          x,
-          y: 40,
-          size: fontSize,
-          font,
-          color: rgb(0.1, 0.1, 0.1),
-        });
+        page.drawImage(sigImg, { x, y, width: sigW, height: sigH });
       });
 
       const bytes = await pdf.save();
@@ -71,69 +78,82 @@ const SignPdfPage = () => {
   return (
     <ToolPageLayout
       title="Sign PDF"
-      description="Add a text signature to your PDF"
+      description="Draw, type, or upload your signature and place it on your PDF"
       accentColor="hsl(173, 58%, 39%)"
       icon={<FileSignature className="h-5 w-5" />}
     >
-      {!file ? (
+      {!file || !fileBytes ? (
         <FileDropZone onFiles={handleFiles} label="Drop a PDF file here" />
       ) : (
-        <>
+        <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <p className="text-sm font-medium">{file.name}</p>
-            <Button variant="ghost" size="sm" className="text-xs" onClick={() => setFile(null)}>
+            <div>
+              <p className="text-sm font-medium truncate max-w-[200px]">{file.name}</p>
+              <p className="text-xs text-muted-foreground">{pageCount} pages</p>
+            </div>
+            <Button variant="ghost" size="sm" className="text-xs min-h-[44px]" onClick={() => { setFile(null); setFileBytes(null); setSigDataUrl(null); }}>
               Change file
             </Button>
           </div>
 
+          {/* Signature creation */}
           <Card>
-            <CardContent className="space-y-4 p-5">
-              <div>
-                <Label className="text-xs font-medium text-muted-foreground">Signature Text</Label>
-                <Input value={signText} onChange={(e) => setSignText(e.target.value)} placeholder="Your Name" className="mt-1" />
-              </div>
+            <CardContent className="p-4 space-y-3">
+              <Label className="font-semibold text-sm">Create Your Signature</Label>
+              <SignaturePad onSignature={setSigDataUrl} />
+            </CardContent>
+          </Card>
 
-              <div>
-                <Label className="text-xs font-medium text-muted-foreground">Font Size: {fontSize}px</Label>
-                <Slider value={[fontSize]} onValueChange={(v) => setFontSize(v[0])} min={8} max={36} step={1} className="mt-2" />
-              </div>
-
-              <div>
-                <Label className="text-xs font-medium text-muted-foreground">Position</Label>
-                <RadioGroup value={position} onValueChange={(v) => setPosition(v as Position)} className="mt-2 space-y-1">
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="bottom-right" id="s-br" />
-                    <Label htmlFor="s-br" className="text-sm">Bottom right</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="bottom-left" id="s-bl" />
-                    <Label htmlFor="s-bl" className="text-sm">Bottom left</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="bottom-center" id="s-bc" />
-                    <Label htmlFor="s-bc" className="text-sm">Bottom center</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-
+          {/* Preview with click-to-place */}
+          <Card>
+            <CardContent className="p-4 space-y-3">
               <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="all-pages"
-                  checked={allPages}
-                  onChange={(e) => setAllPages(e.target.checked)}
-                  className="rounded"
-                />
-                <Label htmlFor="all-pages" className="text-sm">Sign all pages (default: last page only)</Label>
+                <Move className="h-4 w-4 text-muted-foreground" />
+                <Label className="font-semibold text-sm">Click on the page to position your signature</Label>
+              </div>
+              <PdfViewer
+                fileBytes={fileBytes}
+                currentPage={currentPage}
+                onPageChange={setCurrentPage}
+                onCanvasClick={handleCanvasClick}
+                overlay={
+                  sigDataUrl ? (
+                    <div
+                      className="absolute pointer-events-none border-2 border-dashed border-primary/60 rounded bg-primary/5"
+                      style={{
+                        left: `${sigPos.x * 100}%`,
+                        bottom: `${sigPos.y * 100}%`,
+                        transform: "translate(-50%, 50%)",
+                        width: `${sigScale * 100}%`,
+                      }}
+                    >
+                      <img src={sigDataUrl} alt="Signature preview" className="w-full h-auto opacity-80" />
+                    </div>
+                  ) : null
+                }
+              />
+            </CardContent>
+          </Card>
+
+          {/* Options */}
+          <Card>
+            <CardContent className="p-4 space-y-4">
+              <div>
+                <Label className="text-xs font-medium text-muted-foreground">Signature Size: {Math.round(sigScale * 100)}%</Label>
+                <Slider value={[sigScale]} onValueChange={(v) => setSigScale(v[0])} min={0.05} max={0.5} step={0.01} className="mt-2" />
+              </div>
+              <div className="flex items-center gap-2 min-h-[44px]">
+                <Checkbox id="all-pages-sign" checked={allPages} onCheckedChange={(c) => setAllPages(!!c)} />
+                <Label htmlFor="all-pages-sign" className="text-sm">Sign all pages (default: current page only)</Label>
               </div>
             </CardContent>
           </Card>
 
-          <Button onClick={handleSign} disabled={processing || !signText.trim()} className="w-full" size="lg">
+          <Button onClick={handleSign} disabled={processing || !sigDataUrl} className="w-full min-h-[44px]" size="lg">
             <Download className="mr-2 h-4 w-4" />
             {processing ? "Signing…" : "Sign & Download"}
           </Button>
-        </>
+        </div>
       )}
     </ToolPageLayout>
   );
