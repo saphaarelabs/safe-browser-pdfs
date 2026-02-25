@@ -73,6 +73,12 @@ const tools = [
   { title: "Image to Base64", desc: "Convert images to Base64-encoded strings.", icon: Code2, path: "/image-to-base64", color: "hsl(270, 55%, 55%)", category: "image" },
   { title: "Batch Process", desc: "Apply operations to multiple PDFs at once.", icon: Upload, path: "/batch", color: "hsl(150, 55%, 45%)", category: "utility" },
   { title: "PDF Diff", desc: "Compare text content of two PDFs.", icon: GitCompare, path: "/pdf-diff", color: "hsl(35, 70%, 50%)", category: "utility" },
+  // Phase 5 — new tools
+  { title: "Remove Blank Pages", desc: "Auto-detect and remove blank pages.", icon: Trash2, path: "/remove-blank-pages", color: "hsl(350, 65%, 50%)", category: "edit" },
+  { title: "PDF to Excel", desc: "Extract tabular data into Excel.", icon: Table, path: "/pdf-to-excel", color: "hsl(140, 65%, 40%)", category: "convert" },
+  { title: "Stamp PDF", desc: "Add image stamps to every page.", icon: Stamp, path: "/stamp", color: "hsl(280, 55%, 50%)", category: "edit" },
+  { title: "Merge Images", desc: "Stitch images together into one.", icon: ImagePlus, path: "/merge-images", color: "hsl(160, 55%, 45%)", category: "image" },
+  { title: "Resize PDF", desc: "Change page dimensions with scaling.", icon: Scaling, path: "/resize-pdf", color: "hsl(210, 60%, 50%)", category: "edit" },
 ];
 
 const categories = [
@@ -111,7 +117,7 @@ const comparison = [
 ];
 
 const howItWorks = [
-  { step: "1", title: "Choose a tool", desc: "Pick from 50 free tools — editing, converting, images, and more." },
+  { step: "1", title: "Choose a tool", desc: "Pick from 55 free tools — editing, converting, images, and more." },
   { step: "2", title: "Upload your file", desc: "Drag & drop or browse. Your file stays on your device — nothing is uploaded." },
   { step: "3", title: "Download the result", desc: "Processed instantly in your browser. Download and you're done." },
 ];
@@ -127,7 +133,7 @@ const Index = () => {
   });
 
   useEffect(() => {
-    document.title = "PDF Tools — 50 Free Online PDF Tools | Edit, Convert & More";
+    document.title = "PDF Tools — 55 Free Online PDF Tools | Edit, Convert & More";
   }, []);
 
   return (

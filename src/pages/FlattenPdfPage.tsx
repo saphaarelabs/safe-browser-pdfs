@@ -10,10 +10,22 @@ import { toast } from "sonner";
 
 const FlattenPdfPage = () => {
   const [file, setFile] = useState<File | null>(null);
+  const [pageCount, setPageCount] = useState(0);
   const [processing, setProcessing] = useState(false);
   const [result, setResult] = useState<Blob | null>(null);
+  const [fieldCount, setFieldCount] = useState<number | null>(null);
 
-  const handleFiles = useCallback((files: File[]) => { setFile(files[0]); setResult(null); }, []);
+  const handleFiles = useCallback(async (files: File[]) => {
+    const f = files[0];
+    setFile(f);
+    setResult(null);
+    setFieldCount(null);
+    try {
+      const buffer = await f.arrayBuffer();
+      const pdf = await PDFDocument.load(buffer, { ignoreEncryption: true });
+      setPageCount(pdf.getPageCount());
+    } catch { toast.error("Could not read PDF."); }
+  }, []);
 
   const handleFlatten = async () => {
     if (!file) return;
@@ -21,23 +33,22 @@ const FlattenPdfPage = () => {
     try {
       const buffer = await file.arrayBuffer();
       const sourcePdf = await PDFDocument.load(buffer, { ignoreEncryption: true });
-      
-      // Remove form fields
       const form = sourcePdf.getForm();
       const fields = form.getFields();
+      const count = fields.length;
+      setFieldCount(count);
+
       fields.forEach((field) => {
         try { form.removeField(field); } catch { /* some fields can't be removed */ }
       });
 
-      // Re-serialize — this flattens annotations by stripping interactive elements
       const newPdf = await PDFDocument.create();
       const pages = await newPdf.copyPages(sourcePdf, sourcePdf.getPageIndices());
       pages.forEach((p) => newPdf.addPage(p));
-
       const bytes = await newPdf.save();
       const blob = new Blob([bytes as BlobPart], { type: "application/pdf" });
       setResult(blob);
-      toast.success("PDF flattened!");
+      toast.success(`PDF flattened! ${count} form field(s) processed.`);
     } catch {
       toast.error("Failed to flatten PDF.");
     } finally {
@@ -54,13 +65,36 @@ const FlattenPdfPage = () => {
           <Card>
             <CardContent className="p-6">
               <p className="font-semibold">{file.name}</p>
-              <p className="text-sm text-muted-foreground">{(file.size / 1024).toFixed(0)} KB</p>
-              <Button variant="ghost" size="sm" className="mt-2" onClick={() => { setFile(null); setResult(null); }}>Choose different file</Button>
+              <p className="text-sm text-muted-foreground">{pageCount} pages · {(file.size / 1024).toFixed(0)} KB</p>
+              <Button variant="ghost" size="sm" className="mt-2" onClick={() => { setFile(null); setResult(null); setFieldCount(null); }}>Choose different file</Button>
             </CardContent>
           </Card>
+
+          {fieldCount !== null && (
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-semibold">{fieldCount} form field(s) found</p>
+                    <p className="text-xs text-muted-foreground">All interactive elements have been removed.</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-medium">{(file.size / 1024).toFixed(0)} KB → {result ? (result.size / 1024).toFixed(0) : "—"} KB</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           <div className="flex gap-3">
-            <Button onClick={handleFlatten} disabled={processing} className="flex-1" size="lg">{processing ? "Flattening…" : "Flatten PDF"}</Button>
-            {result && <Button onClick={() => saveAs(result, `flattened-${file.name}`)} size="lg" variant="outline" className="gap-2"><Download className="h-4 w-4" /> Download</Button>}
+            <Button onClick={handleFlatten} disabled={processing} className="flex-1 min-h-[44px]" size="lg">
+              {processing ? "Flattening…" : "Flatten PDF"}
+            </Button>
+            {result && (
+              <Button onClick={() => saveAs(result, `flattened-${file.name}`)} size="lg" variant="outline" className="gap-2 min-h-[44px]">
+                <Download className="h-4 w-4" /> Download
+              </Button>
+            )}
           </div>
         </>
       )}

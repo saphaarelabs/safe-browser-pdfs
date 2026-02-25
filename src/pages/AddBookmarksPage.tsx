@@ -1,10 +1,13 @@
 import { useState } from "react";
-import { Bookmark } from "lucide-react";
+import { Bookmark, Download, Plus, X } from "lucide-react";
 import { PDFDocument } from "pdf-lib";
 import ToolPageLayout from "@/components/ToolPageLayout";
 import FileDropZone from "@/components/FileDropZone";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 interface BookmarkEntry { title: string; page: number; }
 
@@ -17,24 +20,28 @@ const AddBookmarksPage = () => {
   const handleFile = async (files: File[]) => {
     const f = files[0];
     setFile(f);
-    const bytes = await f.arrayBuffer();
-    const pdf = await PDFDocument.load(bytes);
-    setPageCount(pdf.getPageCount());
+    try {
+      const bytes = await f.arrayBuffer();
+      const pdf = await PDFDocument.load(bytes);
+      setPageCount(pdf.getPageCount());
+    } catch {
+      toast.error("Could not read this PDF.");
+    }
   };
 
   const handleSave = async () => {
     if (!file) return;
+    const validBookmarks = bookmarks.filter((b) => b.title.trim() && b.page >= 1 && b.page <= pageCount);
+    if (validBookmarks.length === 0) {
+      toast.error("Add at least one bookmark with a title.");
+      return;
+    }
     setProcessing(true);
     try {
       const bytes = await file.arrayBuffer();
       const pdf = await PDFDocument.load(bytes);
-      const validBookmarks = bookmarks.filter((b) => b.title.trim() && b.page >= 1 && b.page <= pdf.getPageCount());
-      // pdf-lib doesn't have a high-level bookmark API, so we set the document outline via the catalog
-      // We'll create a simple outline using the low-level API
-      if (validBookmarks.length === 0) return;
 
-      // For simplicity, we just re-save with metadata indicating bookmarks
-      // pdf-lib doesn't natively support outline creation, so we add them as document keywords for now
+      // Store bookmarks as structured data in metadata
       pdf.setKeywords(validBookmarks.map((b) => `${b.title}:p${b.page}`));
       pdf.setSubject(`Bookmarks: ${validBookmarks.map((b) => `${b.title} (p${b.page})`).join(", ")}`);
 
@@ -44,8 +51,11 @@ const AddBookmarksPage = () => {
       a.href = URL.createObjectURL(blob);
       a.download = file.name.replace(".pdf", "-bookmarked.pdf");
       a.click();
+      URL.revokeObjectURL(a.href);
+      toast.success(`${validBookmarks.length} bookmark(s) saved to metadata!`);
     } catch (e) {
       console.error(e);
+      toast.error("Failed to save bookmarks.");
     } finally {
       setProcessing(false);
     }
@@ -54,7 +64,7 @@ const AddBookmarksPage = () => {
   const updateBookmark = (i: number, field: "title" | "page", value: string | number) => {
     const copy = [...bookmarks];
     if (field === "title") copy[i].title = value as string;
-    else copy[i].page = value as number;
+    else copy[i].page = Math.max(1, Math.min(value as number, pageCount));
     setBookmarks(copy);
   };
 
@@ -63,21 +73,47 @@ const AddBookmarksPage = () => {
       {!file ? (
         <FileDropZone onFiles={handleFile} accept=".pdf" label="Drop a PDF here" />
       ) : (
-        <div className="space-y-4">
-          <p className="text-sm">{file.name} — {pageCount} pages</p>
-          {bookmarks.map((b, i) => (
-            <div key={i} className="flex gap-2 items-end">
-              <div className="flex-1"><label className="text-xs font-medium">Title</label><Input value={b.title} onChange={(e) => updateBookmark(i, "title", e.target.value)} placeholder="Chapter 1" /></div>
-              <div className="w-20"><label className="text-xs font-medium">Page</label><Input type="number" min={1} max={pageCount} value={b.page} onChange={(e) => updateBookmark(i, "page", +e.target.value)} /></div>
-              {bookmarks.length > 1 && <Button variant="ghost" size="sm" onClick={() => setBookmarks(bookmarks.filter((_, j) => j !== i))}>×</Button>}
-            </div>
-          ))}
-          <Button variant="outline" size="sm" onClick={() => setBookmarks([...bookmarks, { title: "", page: 1 }])}>+ Add Bookmark</Button>
-          <div className="flex gap-2">
-            <Button onClick={handleSave} disabled={processing}>{processing ? "Saving…" : "Save Bookmarks"}</Button>
-            <Button variant="outline" onClick={() => setFile(null)}>Clear</Button>
-          </div>
-        </div>
+        <>
+          <Card>
+            <CardContent className="p-6">
+              <p className="font-semibold">{file.name}</p>
+              <p className="text-sm text-muted-foreground">{pageCount} pages · {(file.size / 1024).toFixed(0)} KB</p>
+              <Button variant="ghost" size="sm" className="mt-2" onClick={() => { setFile(null); setBookmarks([{ title: "", page: 1 }]); }}>Choose different file</Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6 space-y-3">
+              <Label className="font-semibold">Bookmarks</Label>
+              <p className="text-xs text-muted-foreground">Bookmark data is stored in PDF metadata (keywords/subject). For true outline bookmarks, a server-side library is needed.</p>
+              {bookmarks.map((b, i) => (
+                <div key={i} className="flex gap-2 items-end">
+                  <div className="flex-1">
+                    <label className="text-xs font-medium text-muted-foreground">Title</label>
+                    <Input value={b.title} onChange={(e) => updateBookmark(i, "title", e.target.value)} placeholder="Chapter 1" className="min-h-[44px]" />
+                  </div>
+                  <div className="w-24">
+                    <label className="text-xs font-medium text-muted-foreground">Page</label>
+                    <Input type="number" min={1} max={pageCount} value={b.page} onChange={(e) => updateBookmark(i, "page", +e.target.value)} className="min-h-[44px]" />
+                  </div>
+                  {bookmarks.length > 1 && (
+                    <Button variant="ghost" size="icon" className="h-[44px] w-[44px] shrink-0" onClick={() => setBookmarks(bookmarks.filter((_, j) => j !== i))}>
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              ))}
+              <Button variant="outline" size="sm" className="min-h-[44px]" onClick={() => setBookmarks([...bookmarks, { title: "", page: 1 }])}>
+                <Plus className="mr-1.5 h-3.5 w-3.5" /> Add Bookmark
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Button onClick={handleSave} disabled={processing} className="w-full min-h-[44px]" size="lg">
+            <Download className="mr-2 h-4 w-4" />
+            {processing ? "Saving…" : "Save Bookmarks & Download"}
+          </Button>
+        </>
       )}
     </ToolPageLayout>
   );
