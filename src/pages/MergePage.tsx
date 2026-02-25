@@ -76,7 +76,7 @@ const MergePage = () => {
       title="Merge PDFs"
       description="Combine multiple PDFs into one document"
       accentColor="hsl(220, 85%, 58%)"
-      icon={<Merge className="h-7 w-7" />}
+      icon={<Merge className="h-5 w-5" />}
     >
       <FileDropZone
         onFiles={handleFiles}
@@ -118,7 +118,7 @@ const MergePage = () => {
         <Button
           onClick={handleMerge}
           disabled={processing || files.length < 2}
-          className="w-full bg-tool-merge text-white hover:bg-tool-merge/90"
+          className="w-full"
           size="lg"
         >
           {processing ? "Merging…" : `Merge ${files.length} Files`}

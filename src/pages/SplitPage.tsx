@@ -107,7 +107,7 @@ const SplitPage = () => {
       title="Split PDF"
       description="Extract pages or split into smaller files"
       accentColor="hsl(150, 70%, 42%)"
-      icon={<Scissors className="h-7 w-7" />}
+      icon={<Scissors className="h-5 w-5" />}
     >
       {!file ? (
         <FileDropZone onFiles={handleFiles} label="Drop a PDF file here" />
@@ -158,7 +158,7 @@ const SplitPage = () => {
           <Button
             onClick={handleSplit}
             disabled={processing}
-            className="w-full bg-tool-split text-white hover:bg-tool-split/90"
+            className="w-full"
             size="lg"
           >
             <Download className="mr-2 h-4 w-4" />

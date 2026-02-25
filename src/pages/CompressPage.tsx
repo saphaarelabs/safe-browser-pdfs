@@ -69,7 +69,7 @@ const CompressPage = () => {
       title="Compress PDF"
       description="Reduce PDF file size"
       accentColor="hsl(30, 90%, 55%)"
-      icon={<Minimize2 className="h-7 w-7" />}
+      icon={<Minimize2 className="h-5 w-5" />}
     >
       {!file ? (
         <FileDropZone onFiles={handleFiles} label="Drop a PDF file here" />
@@ -122,7 +122,7 @@ const CompressPage = () => {
             <Button
               onClick={handleCompress}
               disabled={processing}
-              className="flex-1 bg-tool-compress text-white hover:bg-tool-compress/90"
+              className="flex-1"
               size="lg"
             >
               {processing ? "Compressing…" : "Compress"}

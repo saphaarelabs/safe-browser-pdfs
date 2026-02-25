@@ -76,7 +76,7 @@ const PageNumbersPage = () => {
       title="Page Numbers"
       description="Add page numbers to your PDF"
       accentColor="hsl(45, 90%, 50%)"
-      icon={<Hash className="h-7 w-7" />}
+      icon={<Hash className="h-5 w-5" />}
     >
       {!file ? (
         <FileDropZone onFiles={handleFiles} label="Drop a PDF file here" />
@@ -115,7 +115,7 @@ const PageNumbersPage = () => {
           <Button
             onClick={handleAddNumbers}
             disabled={processing}
-            className="w-full bg-tool-pagenums text-primary-foreground hover:bg-tool-pagenums/90"
+            className="w-full"
             size="lg"
           >
             <Download className="mr-2 h-4 w-4" />
