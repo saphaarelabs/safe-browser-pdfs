@@ -55,7 +55,7 @@ const RotatePage = () => {
       title="Rotate PDF"
       description="Rotate all pages by 90°, 180°, or 270°"
       accentColor="hsl(340, 80%, 55%)"
-      icon={<RotateCw className="h-7 w-7" />}
+      icon={<RotateCw className="h-5 w-5" />}
     >
       {!file ? (
         <FileDropZone onFiles={handleFiles} label="Drop a PDF file here" />
@@ -88,7 +88,7 @@ const RotatePage = () => {
           <Button
             onClick={handleRotate}
             disabled={processing}
-            className="w-full bg-tool-rotate text-primary-foreground hover:bg-tool-rotate/90"
+            className="w-full"
             size="lg"
           >
             <Download className="mr-2 h-4 w-4" />

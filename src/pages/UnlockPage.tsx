@@ -43,7 +43,7 @@ const UnlockPage = () => {
       title="Unlock PDF"
       description="Remove password protection from PDFs"
       accentColor="hsl(120, 65%, 45%)"
-      icon={<Unlock className="h-7 w-7" />}
+      icon={<Unlock className="h-5 w-5" />}
     >
       {!file ? (
         <FileDropZone onFiles={handleFiles} label="Drop a protected PDF here" sublabel="We'll try to remove restrictions" />
@@ -72,7 +72,7 @@ const UnlockPage = () => {
           <Button
             onClick={handleUnlock}
             disabled={processing}
-            className="w-full bg-tool-unlock text-primary-foreground hover:bg-tool-unlock/90"
+            className="w-full"
             size="lg"
           >
             <Download className="mr-2 h-4 w-4" />

@@ -77,7 +77,7 @@ const WatermarkPage = () => {
       title="Watermark PDF"
       description="Add text watermarks to your PDF"
       accentColor="hsl(200, 80%, 50%)"
-      icon={<Stamp className="h-7 w-7" />}
+      icon={<Stamp className="h-5 w-5" />}
     >
       {!file ? (
         <FileDropZone onFiles={handleFiles} label="Drop a PDF file here" />
@@ -129,7 +129,7 @@ const WatermarkPage = () => {
           <Button
             onClick={handleWatermark}
             disabled={processing}
-            className="w-full bg-tool-watermark text-primary-foreground hover:bg-tool-watermark/90"
+            className="w-full"
             size="lg"
           >
             <Download className="mr-2 h-4 w-4" />

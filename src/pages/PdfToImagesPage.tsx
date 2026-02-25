@@ -100,7 +100,7 @@ const PdfToImagesPage = () => {
       title="PDF to Images"
       description="Convert PDF pages to PNG or JPG images"
       accentColor="hsl(280, 70%, 58%)"
-      icon={<ImageIcon className="h-7 w-7" />}
+      icon={<ImageIcon className="h-5 w-5" />}
     >
       {!file ? (
         <FileDropZone onFiles={handleFiles} label="Drop a PDF file here" />
@@ -144,7 +144,7 @@ const PdfToImagesPage = () => {
           <Button
             onClick={handleConvert}
             disabled={processing}
-            className="w-full bg-tool-images text-white hover:bg-tool-images/90"
+            className="w-full"
             size="lg"
           >
             {processing ? `Converting… ${progress}%` : "Convert to Images"}

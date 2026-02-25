@@ -54,7 +54,7 @@ const ProtectPage = () => {
       title="Protect PDF"
       description="Add password protection to your PDF"
       accentColor="hsl(0, 75%, 55%)"
-      icon={<Lock className="h-7 w-7" />}
+      icon={<Lock className="h-5 w-5" />}
     >
       {!file ? (
         <FileDropZone onFiles={handleFiles} label="Drop a PDF file here" />
@@ -91,7 +91,7 @@ const ProtectPage = () => {
           <Button
             onClick={handleProtect}
             disabled={processing || !password.trim()}
-            className="w-full bg-tool-protect text-primary-foreground hover:bg-tool-protect/90"
+            className="w-full"
             size="lg"
           >
             <Download className="mr-2 h-4 w-4" />
