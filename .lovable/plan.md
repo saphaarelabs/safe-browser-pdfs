@@ -1,150 +1,156 @@
 
 
-# Plan: Enhance All 50 Tools to Next Level
+# Plan: Comprehensive Tool Enhancement & New Tools
 
-## Current State Assessment
+## Assessment
 
-After reviewing every tool page, the pattern is clear: most tools are "upload → set a couple options → download" with no preview, no visual feedback, no document viewer, and poor mobile interaction. Here are the specific gaps:
+After reviewing all 50 tools, I found these systematic problems:
 
-### Critical Gaps Across All Tools
+### Tier 1 — Broken/Fake Tools (urgent)
+- **Protect PDF**: Doesn't actually encrypt. Just copies pages and adds metadata. Misleading.
+- **Add Bookmarks**: Doesn't add real bookmarks. Just stores them in keywords metadata. Useless.
+- **Add QR Code**: Generates a fake QR pattern, not a real scannable QR code. Needs a proper encoder.
 
-1. **No PDF preview** — Users never see their document before or after processing. They upload blindly and download blindly.
-2. **No signature drawing** — Sign PDF only allows typed text, not drawn/uploaded signatures.
-3. **No visual page selection** — Delete Pages, Extract Pages, Organize Pages use checkbox grids with page numbers instead of thumbnail previews.
-4. **Canvas tools broken on mobile** — Redact, Annotate, Crop Image use mouse events only (no touch support).
-5. **No progress feedback** — Most tools show no progress during processing. Only Grayscale and PDF to Images have progress bars.
-6. **No drag-and-drop reordering** — Organize and Merge use up/down arrow buttons instead of drag.
-7. **No undo** — Canvas-based tools (Redact, Annotate) have no undo, only "clear all".
-8. **Only page 1** — Redact and Annotate only work on page 1, silently ignoring other pages.
+### Tier 2 — Bare-Bones Tools (no preview, no feedback, tiny UI)
+These tools are just "upload → click → download" with no file info card, no preview, no progress, and missing touch targets:
+- ReversePdfPage, PdfToHtmlPage, PdfToJsonPage, PdfToXmlPage, PdfToMarkdownPage, MarkdownToPdfPage, DuplicatePagesPage, PdfToTiffPage, WordToPdfPage, ExcelToPdfPage, PdfToPptPage, PdfToTextPage, PdfToWordPage, BatchProcessPage, PdfDiffPage, PdfPageSizePage, AddBookmarksPage, HtmlToPdfPage
+
+### Tier 3 — Good But Missing Polish
+- **RotatePage**: No preview of rotated result, no per-page rotation
+- **CompressPage**: Good progress bar but no page count display
+- **PdfToImagesPage**: Good but images grid could show dimensions
+- **UnlockPage**: Works but no feedback on whether PDF was actually protected
+- **FlattenPdfPage**: No feedback on how many fields were removed
+- **GrayscalePdfPage**: Good but no before/after comparison
+- **ComparePdfsPage**: Only compares page 1, no multi-page support
+- **RotateImagePage / FlipImagePage**: No live preview of the result (only CSS transform)
+
+### Tier 4 — Already Enhanced (good state)
+- SignPdfPage, OrganizePage, DeletePagesPage, ExtractPagesPage, RedactPdfPage, AnnotatePdfPage, CropImagePage, CropPdfPage, WatermarkPage, PageNumbersPage, HeaderFooterPage, MergePage, SplitPage, CompressImagesPage, ResizeImagesPage, ConvertImagePage
 
 ---
 
 ## Enhancement Plan
 
-This is a large scope. I will focus on the **highest-impact, most-visible enhancements** that transform the user experience across the most tools with shared components.
+### Batch 1: Fix Broken Tools + Consistent UI Pass
 
-### Phase 1: Shared Components (foundation for everything)
+**1. Fix Protect PDF** — Be honest: pdf-lib cannot encrypt. Change to clearly state it re-serializes the PDF (removes existing restrictions) and explain the limitation. Add page count, file size display.
 
-**A. PDF Page Thumbnail Renderer** (`src/components/PdfPageThumbnail.tsx`)
-- Renders a single PDF page as a canvas thumbnail at configurable scale
-- Used by: Organize, Delete Pages, Extract Pages, Split, Merge (to show page previews)
-- Lazy-renders only visible thumbnails for performance
+**2. Fix Add Bookmarks** — Since pdf-lib lacks outline API, change approach: display the PDF with PdfViewer, let users click pages to set bookmark points, store bookmark data as structured JSON in the document's XMP metadata. Be transparent about limitations.
 
-**B. PDF Document Viewer** (`src/components/PdfViewer.tsx`)
-- Full single-page viewer with page navigation (prev/next), zoom controls
-- Touch-friendly swipe navigation for mobile
-- Used by: Sign PDF, Watermark, Page Numbers, Header/Footer (to preview placement)
+**3. Fix Add QR Code** — Implement a real QR code encoder using a simple alphanumeric QR algorithm (Mode 2, Version 1-4). Canvas-based, no external library. Show a live preview of the generated QR before embedding.
 
-**C. Signature Pad** (`src/components/SignaturePad.tsx`)
-- Canvas-based drawing pad with touch support
-- Options: Draw, Type, or Upload image
-- Outputs a PNG image that gets embedded via pdf-lib
-- Color picker, thickness slider, clear button
+**4. Consistent UI Pass on all 18 bare-bones tools** — Apply the same Card-based layout pattern:
+- File info Card with name, size, page count, "Change file" button
+- All buttons get `min-h-[44px]` and `className="w-full"` or proper flex layout
+- Toast notifications for success/error on every tool
+- Preview sections where applicable (text output tools show preview before download)
+- Copy-to-clipboard buttons on text output tools
 
-**D. Touch-Aware Canvas** (`src/hooks/useTouchCanvas.ts`)
-- Hook that normalizes mouse and touch events for canvas drawing
-- Handles pointer events (pointerdown, pointermove, pointerup) for cross-device support
-- Used by: Redact, Annotate, Crop Image, Signature Pad
+### Batch 2: Meaningful Feature Upgrades
 
-### Phase 2: Sign PDF (complete overhaul)
+**5. Rotate PDF** — Add per-page rotation: show thumbnail grid, click thumbnails to rotate individual pages (90° per click). Visual rotation indicator on each thumbnail.
 
-Current: text input only, fixed positions, no preview.
+**6. Compare PDFs** — Add multi-page comparison: page navigation, side-by-side view option (not just diff overlay), percentage similarity score.
 
-Enhanced:
-- **3 signature modes**: Draw (canvas pad), Type (with font choices like cursive), Upload (image file)
-- **Live PDF preview** showing the document with page navigation
-- **Drag-to-position** the signature anywhere on the page by clicking/tapping
-- **Resize handle** on the signature
-- **Page selector** — choose which pages to sign
-- **Signature color** picker (black, blue, red)
-- Mobile: full touch support for drawing and positioning
+**7. Batch Process** — Add more operations: compress, grayscale, add watermark, add page numbers. Show progress bar per file. Show file list with remove buttons.
 
-### Phase 3: Visual Page Selection Tools
+**8. PDF Page Size** — Auto-analyze on file load (don't require clicking "Analyze"). Add page size labels (A4, Letter, Legal, etc.). Export as CSV.
 
-Enhance **Organize Pages**, **Delete Pages**, **Extract Pages**, and **Split PDF**:
-- Replace checkbox grids with **thumbnail grids** showing actual page content
-- Click-to-select with visual highlight (blue border for selected, red for delete)
-- Drag-to-reorder in Organize (using pointer events)
-- "Select all" / "Deselect all" / "Select range" quick actions
-- Mobile: responsive grid (2 columns on mobile, 4 on desktop)
+**9. Images to PDF** — Add page size options (A4, Letter, fit-to-image). Add margin controls. Show image preview thumbnails.
 
-### Phase 4: Canvas Tools — Multi-Page + Touch + Undo
+**10. Flatten PDF** — Show count of form fields found and removed. Show before/after comparison.
 
-Enhance **Redact PDF**, **Annotate PDF**:
-- **All pages** — page navigation to draw on any page, not just page 1
-- **Touch support** via pointer events (works on mobile/tablet)
-- **Undo/Redo** stack (store annotation arrays per page)
-- **Zoom** controls for precise drawing
-- Annotate: add **text annotation** mode (click to place text note), **freehand drawing** mode
-- Redact: add **auto-detect text** option (select text runs to redact)
+### Batch 3: New Tools (5 more, reaching 55)
 
-### Phase 5: Preview & Feedback for Remaining Tools
+**11. Remove Blank Pages** (`/remove-blank-pages`) — Render each page, analyze pixel data to detect blank pages, remove them automatically. Show which pages were blank.
 
-**Watermark**: Live preview showing watermark overlaid on page 1 before applying.
+**12. PDF to Excel** (`/pdf-to-excel`) — Extract tabular data using text position analysis, output as .xlsx using the xlsx library.
 
-**Compress**: Show animated progress bar, before/after file size comparison with percentage saved (already partially done — polish it).
+**13. Stamp PDF** (`/stamp`) — Upload an image (logo, "APPROVED" badge) and place it on PDF pages with position/size controls and live preview.
 
-**Crop PDF**: Replace number inputs with a **visual crop overlay** on page 1 preview. Drag handles to set crop area.
+**14. Merge Images** (`/merge-images`) — Stitch multiple images side-by-side or vertically into a single image. Canvas-based.
 
-**Crop Image**: Replace X/Y/W/H number inputs with **interactive crop rectangle** on the image with drag handles. Touch support.
-
-**Merge**: Show page count per file, total pages counter, thumbnail preview of first page per file.
-
-**Page Numbers / Header Footer**: Live preview of where numbers/text will appear on a sample page.
-
-### Phase 6: Mobile Optimization (all tools)
-
-- All buttons: `min-h-[44px]` touch targets
-- FileDropZone: larger tap area on mobile, camera capture option for image tools
-- Tool options: stack vertically on mobile instead of horizontal grids
-- Canvas tools: pinch-to-zoom support
-- All file info cards: truncate long filenames properly
+**15. Resize PDF Pages** (`/resize-pdf`) — Change page dimensions (A4, Letter, custom) with content scaling options.
 
 ---
 
 ## Technical Details
 
-### New Files
-- `src/components/PdfPageThumbnail.tsx` — renders a PDF page as thumbnail
-- `src/components/PdfViewer.tsx` — full page viewer with navigation
-- `src/components/SignaturePad.tsx` — draw/type/upload signature component
-- `src/hooks/useTouchCanvas.ts` — pointer event normalization hook
+### New Files (5 tool pages)
+- `src/pages/RemoveBlankPagesPage.tsx`
+- `src/pages/PdfToExcelPage.tsx`
+- `src/pages/StampPdfPage.tsx`
+- `src/pages/MergeImagesPage.tsx`
+- `src/pages/ResizePdfPage.tsx`
 
-### Modified Files (major rewrites)
-- `src/pages/SignPdfPage.tsx` — complete overhaul with 3 signature modes + preview + positioning
-- `src/pages/OrganizePage.tsx` — thumbnail grid with drag reorder
-- `src/pages/DeletePagesPage.tsx` — thumbnail grid with visual selection
-- `src/pages/ExtractPagesPage.tsx` — thumbnail grid with visual selection
-- `src/pages/RedactPdfPage.tsx` — multi-page, touch, undo
-- `src/pages/AnnotatePdfPage.tsx` — multi-page, touch, undo, text mode
-- `src/pages/CropImagePage.tsx` — interactive visual crop rectangle
-- `src/pages/CropPdfPage.tsx` — visual crop overlay on page preview
-- `src/pages/WatermarkPage.tsx` — live preview of watermark placement
-- `src/pages/PageNumbersPage.tsx` — live preview of number placement
-- `src/pages/HeaderFooterPage.tsx` — live preview
-- `src/components/FileDropZone.tsx` — mobile camera capture, larger touch targets
+### Modified Files — Major Rewrites (3)
+- `src/pages/AddQrCodePage.tsx` — Real QR encoder
+- `src/pages/ProtectPage.tsx` — Honest UI about limitations
+- `src/pages/AddBookmarksPage.tsx` — Better UX with PdfViewer
 
-### Modified Files (minor enhancements)
-- `src/pages/MergePage.tsx` — first-page thumbnail per file
-- `src/pages/SplitPage.tsx` — thumbnail grid for page selection
-- `src/pages/CompressPage.tsx` — better progress animation
-- `src/pages/ConvertImagePage.tsx` — image preview with before/after
-- `src/pages/CompressImagesPage.tsx` — thumbnail previews
-- `src/pages/ResizeImagesPage.tsx` — live preview of resized output
-- `src/components/ToolPageLayout.tsx` — wider max-width for tools that need it (optional `wide` prop)
+### Modified Files — UI Polish Pass (18)
+- `src/pages/ReversePdfPage.tsx`
+- `src/pages/PdfToHtmlPage.tsx`
+- `src/pages/PdfToJsonPage.tsx`
+- `src/pages/PdfToXmlPage.tsx`
+- `src/pages/PdfToMarkdownPage.tsx`
+- `src/pages/MarkdownToPdfPage.tsx`
+- `src/pages/DuplicatePagesPage.tsx`
+- `src/pages/PdfToTiffPage.tsx`
+- `src/pages/WordToPdfPage.tsx`
+- `src/pages/ExcelToPdfPage.tsx`
+- `src/pages/PdfToPptPage.tsx`
+- `src/pages/PdfToTextPage.tsx`
+- `src/pages/PdfToWordPage.tsx`
+- `src/pages/PdfPageSizePage.tsx`
+- `src/pages/HtmlToPdfPage.tsx`
+- `src/pages/BatchProcessPage.tsx`
+- `src/pages/RotatePage.tsx`
+- `src/pages/ComparePdfsPage.tsx`
+
+### Modified Files — Feature Upgrades (5)
+- `src/pages/FlattenPdfPage.tsx` — Field count display
+- `src/pages/ImagesToPdfPage.tsx` — Page size options
+- `src/pages/PdfDiffPage.tsx` — Multi-page support
+- `src/pages/RotateImagePage.tsx` — Live canvas preview
+- `src/pages/FlipImagePage.tsx` — Live canvas preview
+
+### Modified Files — Navigation & SEO (4)
+- `src/App.tsx` — 5 new lazy imports + routes
+- `src/pages/Index.tsx` — 5 new tool entries, update count to 55
+- `src/components/Navbar.tsx` — Add 5 new tools
+- `src/components/Footer.tsx` — Add 5 new tools, update count
 
 ### Dependencies
-- No new dependencies. All enhancements use existing canvas APIs, pointer events, and pdf.js/pdf-lib.
+- No new dependencies. QR encoding uses a custom canvas implementation. Excel export uses existing `xlsx` library.
 
-### Implementation Priority
-Given the scope, I will implement in this order:
-1. Shared components (PdfPageThumbnail, SignaturePad, useTouchCanvas)
-2. Sign PDF overhaul (highest-visibility improvement)
-3. Visual page selection (Organize, Delete, Extract)
-4. Canvas tools touch + multi-page (Redact, Annotate)
-5. Visual crop tools (Crop Image, Crop PDF)
-6. Live previews (Watermark, Page Numbers, Header/Footer)
-7. Mobile polish pass across all tools
+### UI Polish Pattern
+Every tool will follow this consistent structure:
+```text
+┌─────────────────────────────┐
+│  FileDropZone               │  ← Upload state
+└─────────────────────────────┘
 
-This is a very large change set. I recommend implementing it in **2-3 batches** to keep changes reviewable. The first batch would cover items 1-3 (shared components + Sign PDF + visual page tools). The second batch would cover items 4-7 (canvas tools + previews + mobile).
+┌─────────────────────────────┐
+│  Card: File Info             │  ← Name, size, pages, "Change"
+├─────────────────────────────┤
+│  Card: Options/Settings      │  ← Tool-specific controls
+├─────────────────────────────┤
+│  Card: Preview (if any)      │  ← Output preview
+├─────────────────────────────┤
+│  Progress bar (if processing)│
+├─────────────────────────────┤
+│  [Process Button] [Download] │  ← min-h-[44px], full width
+└─────────────────────────────┘
+```
+
+### Implementation Order
+1. Fix the 3 broken tools (QR, Protect, Bookmarks)
+2. UI polish pass on all 18 bare-bones tools
+3. Feature upgrades on 5 tools (Rotate, Compare, Batch, Flatten, Images to PDF)
+4. Create 5 new tool pages
+5. Update navigation, homepage, and SEO
+
+This is a large batch. I'll implement it in two rounds: first the fixes + UI polish, then the new tools + feature upgrades.
 
