@@ -15,6 +15,9 @@ const toolLinks = [
   { name: "Organize Pages", path: "/organize" },
   { name: "Edit Metadata", path: "/edit-metadata" },
   { name: "Sign PDF", path: "/sign" },
+  { name: "PDF to Word", path: "/pdf-to-word" },
+  { name: "PDF to PPT", path: "/pdf-to-ppt" },
+  { name: "PDF to Text", path: "/pdf-to-text" },
 ];
 
 const Footer = () => (
@@ -52,7 +55,7 @@ const Footer = () => (
           <h4 className="text-sm font-semibold mb-3">Project</h4>
           <div className="flex flex-col gap-1.5">
             <a
-              href="https://github.com/nicholasxdavis/pdf-tools"
+              href="https://github.com/saphaarelabs/safe-browser-pdfs"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-[13px] text-muted-foreground hover:text-foreground transition-colors"
@@ -60,7 +63,7 @@ const Footer = () => (
               <Github className="h-3.5 w-3.5" /> Source Code
             </a>
             <a
-              href="https://github.com/nicholasxdavis/pdf-tools/issues"
+              href="https://github.com/saphaarelabs/safe-browser-pdfs/issues"
               target="_blank"
               rel="noopener noreferrer"
               className="text-[13px] text-muted-foreground hover:text-foreground transition-colors"

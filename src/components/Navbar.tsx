@@ -48,7 +48,7 @@ const Navbar = () => {
 
           <div className="ml-2 h-4 w-px bg-border" />
 
-          <a href="https://github.com/nicholasxdavis/pdf-tools" target="_blank" rel="noopener noreferrer" className="ml-1">
+          <a href="https://github.com/saphaarelabs/safe-browser-pdfs" target="_blank" rel="noopener noreferrer" className="ml-1">
             <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
               <Github className="h-4 w-4" />
             </Button>
@@ -87,7 +87,7 @@ const Navbar = () => {
             ))}
           </div>
           <div className="mt-2 border-t pt-2">
-            <a href="https://github.com/nicholasxdavis/pdf-tools" target="_blank" rel="noopener noreferrer">
+            <a href="https://github.com/saphaarelabs/safe-browser-pdfs" target="_blank" rel="noopener noreferrer">
               <Button variant="ghost" size="sm" className="w-full justify-start gap-2 text-[13px] text-muted-foreground">
                 <Github className="h-3.5 w-3.5" /> GitHub
               </Button>
