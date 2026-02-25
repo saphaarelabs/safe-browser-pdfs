@@ -46,6 +46,18 @@ const ComparePdfsPage = lazy(() => import("./pages/ComparePdfsPage"));
 const ExcelToPdfPage = lazy(() => import("./pages/ExcelToPdfPage"));
 const WordToPdfPage = lazy(() => import("./pages/WordToPdfPage"));
 const AnnotatePdfPage = lazy(() => import("./pages/AnnotatePdfPage"));
+const PdfToMarkdownPage = lazy(() => import("./pages/PdfToMarkdownPage"));
+const MarkdownToPdfPage = lazy(() => import("./pages/MarkdownToPdfPage"));
+const HeaderFooterPage = lazy(() => import("./pages/HeaderFooterPage"));
+const PdfToXmlPage2 = lazy(() => import("./pages/PdfToXmlPage"));
+const DuplicatePagesPage = lazy(() => import("./pages/DuplicatePagesPage"));
+const AddQrCodePage = lazy(() => import("./pages/AddQrCodePage"));
+const PdfToTiffPage = lazy(() => import("./pages/PdfToTiffPage"));
+const RotateImagePage = lazy(() => import("./pages/RotateImagePage"));
+const FlipImagePage = lazy(() => import("./pages/FlipImagePage"));
+const ImageToBase64Page = lazy(() => import("./pages/ImageToBase64Page"));
+const BatchProcessPage = lazy(() => import("./pages/BatchProcessPage"));
+const PdfDiffPage = lazy(() => import("./pages/PdfDiffPage"));
 
 const queryClient = new QueryClient();
 
@@ -102,6 +114,18 @@ const App = () => (
             <Route path="/excel-to-pdf" element={<ExcelToPdfPage />} />
             <Route path="/word-to-pdf" element={<WordToPdfPage />} />
             <Route path="/annotate" element={<AnnotatePdfPage />} />
+            <Route path="/pdf-to-markdown" element={<PdfToMarkdownPage />} />
+            <Route path="/markdown-to-pdf" element={<MarkdownToPdfPage />} />
+            <Route path="/header-footer" element={<HeaderFooterPage />} />
+            <Route path="/pdf-to-xml" element={<PdfToXmlPage2 />} />
+            <Route path="/duplicate-pages" element={<DuplicatePagesPage />} />
+            <Route path="/add-qr-code" element={<AddQrCodePage />} />
+            <Route path="/pdf-to-tiff" element={<PdfToTiffPage />} />
+            <Route path="/rotate-image" element={<RotateImagePage />} />
+            <Route path="/flip-image" element={<FlipImagePage />} />
+            <Route path="/image-to-base64" element={<ImageToBase64Page />} />
+            <Route path="/batch" element={<BatchProcessPage />} />
+            <Route path="/pdf-diff" element={<PdfDiffPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
