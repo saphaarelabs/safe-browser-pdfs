@@ -17,6 +17,9 @@ import ImagesToPdfPage from "./pages/ImagesToPdfPage";
 import OrganizePage from "./pages/OrganizePage";
 import EditMetadataPage from "./pages/EditMetadataPage";
 import SignPdfPage from "./pages/SignPdfPage";
+import PdfToWordPage from "./pages/PdfToWordPage";
+import PdfToPptPage from "./pages/PdfToPptPage";
+import PdfToTextPage from "./pages/PdfToTextPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,6 +45,9 @@ const App = () => (
           <Route path="/organize" element={<OrganizePage />} />
           <Route path="/edit-metadata" element={<EditMetadataPage />} />
           <Route path="/sign" element={<SignPdfPage />} />
+          <Route path="/pdf-to-word" element={<PdfToWordPage />} />
+          <Route path="/pdf-to-ppt" element={<PdfToPptPage />} />
+          <Route path="/pdf-to-text" element={<PdfToTextPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

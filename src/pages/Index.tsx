@@ -2,7 +2,8 @@ import { Link } from "react-router-dom";
 import {
   Merge, Scissors, Minimize2, Image, RotateCw, Stamp, Hash,
   Lock, Unlock, ArrowRight, Shield, Zap, Globe, Github,
-  Layers, FileSignature, FileEdit, ImagePlus,
+  Layers, FileSignature, FileEdit, ImagePlus, FileText,
+  Presentation, FileType,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
@@ -22,6 +23,9 @@ const tools = [
   { title: "Organize Pages", desc: "Reorder, delete, or duplicate pages.", icon: Layers, path: "/organize", color: "hsl(210, 40%, 48%)" },
   { title: "Edit Metadata", desc: "Change title, author, and properties.", icon: FileEdit, path: "/edit-metadata", color: "hsl(270, 50%, 50%)" },
   { title: "Sign PDF", desc: "Add a text signature to your PDF.", icon: FileSignature, path: "/sign", color: "hsl(173, 58%, 39%)" },
+  { title: "PDF to Word", desc: "Convert PDF to editable Word document.", icon: FileText, path: "/pdf-to-word", color: "hsl(221, 70%, 50%)" },
+  { title: "PDF to PowerPoint", desc: "Convert PDF pages into a presentation.", icon: Presentation, path: "/pdf-to-ppt", color: "hsl(25, 90%, 50%)" },
+  { title: "PDF to Text", desc: "Extract all text content from a PDF.", icon: FileType, path: "/pdf-to-text", color: "hsl(160, 60%, 40%)" },
 ];
 
 const features = [
@@ -51,7 +55,7 @@ const Index = () => (
               Get Started <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
-          <a href="https://github.com/nicholasxdavis/pdf-tools" target="_blank" rel="noopener noreferrer">
+          <a href="https://github.com/saphaarelabs/safe-browser-pdfs" target="_blank" rel="noopener noreferrer">
             <Button variant="outline" size="lg" className="gap-2 px-6">
               <Github className="h-4 w-4" /> GitHub
             </Button>
