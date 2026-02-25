@@ -33,6 +33,19 @@ const RepairPdfPage = lazy(() => import("./pages/RepairPdfPage"));
 const HtmlToPdfPage = lazy(() => import("./pages/HtmlToPdfPage"));
 const ResizeImagesPage = lazy(() => import("./pages/ResizeImagesPage"));
 const CompressImagesPage = lazy(() => import("./pages/CompressImagesPage"));
+// New Phase 1-3 tools
+const ReversePdfPage = lazy(() => import("./pages/ReversePdfPage"));
+const ConvertImagePage = lazy(() => import("./pages/ConvertImagePage"));
+const CropImagePage = lazy(() => import("./pages/CropImagePage"));
+const PdfToJsonPage = lazy(() => import("./pages/PdfToJsonPage"));
+const PdfPageSizePage = lazy(() => import("./pages/PdfPageSizePage"));
+const RedactPdfPage = lazy(() => import("./pages/RedactPdfPage"));
+const AddBookmarksPage = lazy(() => import("./pages/AddBookmarksPage"));
+const PdfToHtmlPage = lazy(() => import("./pages/PdfToHtmlPage"));
+const ComparePdfsPage = lazy(() => import("./pages/ComparePdfsPage"));
+const ExcelToPdfPage = lazy(() => import("./pages/ExcelToPdfPage"));
+const WordToPdfPage = lazy(() => import("./pages/WordToPdfPage"));
+const AnnotatePdfPage = lazy(() => import("./pages/AnnotatePdfPage"));
 
 const queryClient = new QueryClient();
 
@@ -77,6 +90,18 @@ const App = () => (
             <Route path="/html-to-pdf" element={<HtmlToPdfPage />} />
             <Route path="/resize-images" element={<ResizeImagesPage />} />
             <Route path="/compress-images" element={<CompressImagesPage />} />
+            <Route path="/reverse" element={<ReversePdfPage />} />
+            <Route path="/convert-image" element={<ConvertImagePage />} />
+            <Route path="/crop-image" element={<CropImagePage />} />
+            <Route path="/pdf-to-json" element={<PdfToJsonPage />} />
+            <Route path="/pdf-page-size" element={<PdfPageSizePage />} />
+            <Route path="/redact" element={<RedactPdfPage />} />
+            <Route path="/add-bookmarks" element={<AddBookmarksPage />} />
+            <Route path="/pdf-to-html" element={<PdfToHtmlPage />} />
+            <Route path="/compare" element={<ComparePdfsPage />} />
+            <Route path="/excel-to-pdf" element={<ExcelToPdfPage />} />
+            <Route path="/word-to-pdf" element={<WordToPdfPage />} />
+            <Route path="/annotate" element={<AnnotatePdfPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
