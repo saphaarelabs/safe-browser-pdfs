@@ -58,6 +58,11 @@ const FlipImagePage = lazy(() => import("./pages/FlipImagePage"));
 const ImageToBase64Page = lazy(() => import("./pages/ImageToBase64Page"));
 const BatchProcessPage = lazy(() => import("./pages/BatchProcessPage"));
 const PdfDiffPage = lazy(() => import("./pages/PdfDiffPage"));
+const RemoveBlankPagesPage = lazy(() => import("./pages/RemoveBlankPagesPage"));
+const PdfToExcelPage = lazy(() => import("./pages/PdfToExcelPage"));
+const StampPdfPage = lazy(() => import("./pages/StampPdfPage"));
+const MergeImagesPage = lazy(() => import("./pages/MergeImagesPage"));
+const ResizePdfPage = lazy(() => import("./pages/ResizePdfPage"));
 
 const queryClient = new QueryClient();
 
@@ -126,6 +131,11 @@ const App = () => (
             <Route path="/image-to-base64" element={<ImageToBase64Page />} />
             <Route path="/batch" element={<BatchProcessPage />} />
             <Route path="/pdf-diff" element={<PdfDiffPage />} />
+            <Route path="/remove-blank-pages" element={<RemoveBlankPagesPage />} />
+            <Route path="/pdf-to-excel" element={<PdfToExcelPage />} />
+            <Route path="/stamp" element={<StampPdfPage />} />
+            <Route path="/merge-images" element={<MergeImagesPage />} />
+            <Route path="/resize-pdf" element={<ResizePdfPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

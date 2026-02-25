@@ -13,24 +13,31 @@ const defaultHtml = `<!DOCTYPE html>
 <body>
   <h1>Hello World</h1>
   <p>This HTML will be converted to PDF using your browser's print function.</p>
+  <ul>
+    <li>Item One</li>
+    <li>Item Two</li>
+  </ul>
 </body>
 </html>`;
 
 const HtmlToPdfPage = () => {
   const [html, setHtml] = useState(defaultHtml);
 
+  const handlePreview = () => {
+    const w = window.open("", "_blank");
+    if (!w) { toast.error("Please allow popups."); return; }
+    w.document.write(html);
+    w.document.close();
+    toast.success("Preview opened!");
+  };
+
   const handlePrint = () => {
     try {
       const printWindow = window.open("", "_blank");
-      if (!printWindow) {
-        toast.error("Please allow popups to use this tool.");
-        return;
-      }
+      if (!printWindow) { toast.error("Please allow popups to use this tool."); return; }
       printWindow.document.write(html);
       printWindow.document.close();
-      printWindow.onload = () => {
-        printWindow.print();
-      };
+      printWindow.onload = () => printWindow.print();
       toast.success("Print dialog opened — save as PDF!");
     } catch {
       toast.error("Failed to generate PDF from HTML.");
@@ -42,21 +49,14 @@ const HtmlToPdfPage = () => {
       <Card>
         <CardContent className="p-6 space-y-4">
           <Label className="font-semibold">Paste your HTML</Label>
-          <Textarea
-            value={html}
-            onChange={(e) => setHtml(e.target.value)}
-            rows={12}
-            className="font-mono text-xs"
-            placeholder="<html>...</html>"
-          />
-          <p className="text-xs text-muted-foreground">
-            Uses your browser's built-in "Print to PDF" — choose "Save as PDF" in the print dialog.
-          </p>
+          <Textarea value={html} onChange={(e) => setHtml(e.target.value)} rows={14} className="font-mono text-xs" placeholder="<html>...</html>" />
+          <p className="text-xs text-muted-foreground">Uses your browser's built-in "Print to PDF" — choose "Save as PDF" in the print dialog.</p>
         </CardContent>
       </Card>
-      <Button onClick={handlePrint} className="w-full" size="lg" disabled={!html.trim()}>
-        Print as PDF
-      </Button>
+      <div className="flex gap-2">
+        <Button onClick={handlePrint} className="flex-1 min-h-[44px]" size="lg" disabled={!html.trim()}>Print as PDF</Button>
+        <Button variant="outline" onClick={handlePreview} className="min-h-[44px]" size="lg" disabled={!html.trim()}>Preview</Button>
+      </div>
     </ToolPageLayout>
   );
 };

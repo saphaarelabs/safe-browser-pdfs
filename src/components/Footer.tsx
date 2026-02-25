@@ -27,6 +27,9 @@ const footerSections = [
       { name: "Header/Footer", path: "/header-footer" },
       { name: "Duplicate Pages", path: "/duplicate-pages" },
       { name: "Add QR Code", path: "/add-qr-code" },
+      { name: "Remove Blank Pages", path: "/remove-blank-pages" },
+      { name: "Stamp PDF", path: "/stamp" },
+      { name: "Resize PDF", path: "/resize-pdf" },
     ],
   },
   {
@@ -47,6 +50,7 @@ const footerSections = [
       { name: "Markdown to PDF", path: "/markdown-to-pdf" },
       { name: "PDF to XML", path: "/pdf-to-xml" },
       { name: "PDF to TIFF", path: "/pdf-to-tiff" },
+      { name: "PDF to Excel", path: "/pdf-to-excel" },
     ],
   },
   {
@@ -61,6 +65,7 @@ const footerSections = [
       { name: "Rotate Image", path: "/rotate-image" },
       { name: "Flip Image", path: "/flip-image" },
       { name: "Image to Base64", path: "/image-to-base64" },
+      { name: "Merge Images", path: "/merge-images" },
       { name: "Protect PDF", path: "/protect" },
       { name: "Unlock PDF", path: "/unlock" },
       { name: "Batch Process", path: "/batch" },
@@ -81,7 +86,7 @@ const Footer = () => (
             PDF Tools
           </Link>
           <p className="mt-3 text-sm text-muted-foreground leading-relaxed max-w-xs">
-            50 free, open-source PDF tools that run entirely in your browser. No uploads, no servers, no tricks.
+            55 free, open-source PDF tools that run entirely in your browser. No uploads, no servers, no tricks.
           </p>
           <div className="mt-4 flex flex-col gap-1.5">
             <a href="https://github.com/saphaarelabs/safe-browser-pdfs" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[13px] text-muted-foreground hover:text-foreground transition-colors">

@@ -64,6 +64,11 @@ const moreTools = [
   { name: "Image to Base64", path: "/image-to-base64" },
   { name: "Batch Process", path: "/batch" },
   { name: "PDF Diff", path: "/pdf-diff" },
+  { name: "Remove Blank Pages", path: "/remove-blank-pages" },
+  { name: "PDF to Excel", path: "/pdf-to-excel" },
+  { name: "Stamp PDF", path: "/stamp" },
+  { name: "Merge Images", path: "/merge-images" },
+  { name: "Resize PDF", path: "/resize-pdf" },
 ];
 
 const allTools = [...mainTools, ...moreTools];
