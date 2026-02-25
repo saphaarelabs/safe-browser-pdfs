@@ -1,91 +1,77 @@
 
 
-# What's Missing to Make This the Best PDF Toolkit
+# More Tools to Add — Closing Every Gap
 
-## Current State (16 tools)
-Merge, Split, Compress, PDF→Images, Images→PDF, Rotate, Watermark, Page Numbers, Protect, Unlock, Organize Pages, Edit Metadata, Sign PDF, PDF→Word, PDF→PowerPoint, PDF→Text.
-
-## Gap Analysis vs. iLovePDF / Smallpdf / Adobe Acrobat Online
-
-Here's what the app still needs across several categories:
+You currently have **26 tools**. Here's what's still missing compared to iLovePDF, Smallpdf, Adobe Acrobat Online, and PDF24 — all implementable 100% in the browser.
 
 ---
 
-### 1. Missing Tools (New Pages)
+## New Tools to Add (12 more → 38 total)
 
-**Conversion tools:**
-- **HTML to PDF** — paste a URL or HTML snippet, render it to PDF using the browser's print-to-PDF pipeline
-- **PDF to Excel / CSV** — extract tabular data from PDFs into spreadsheet format (using `pdfjs-dist` text extraction + heuristic table detection)
+### Conversion (4 new)
+| Tool | How it works (browser-only) |
+|---|---|
+| **PDF to JSON** | Extract text via `pdfjs-dist`, output structured JSON with page/paragraph grouping |
+| **PDF to HTML** | Extract text + positions via `pdfjs-dist`, generate semantic HTML with basic layout |
+| **Excel to PDF** | Parse `.xlsx` with SheetJS (`xlsx` package), render table to canvas/HTML, convert to PDF via `pdf-lib` |
+| **Word to PDF** | Parse `.docx` with `mammoth.js`, render HTML, print to PDF via browser pipeline |
 
-**Editing tools:**
-- **Crop PDF** — let users draw a crop box on a page preview and apply it to all or selected pages (using `pdf-lib` mediaBox/cropBox manipulation)
-- **Flatten PDF** — remove form fields and annotations, baking them into the page content
-- **Grayscale PDF** — convert a color PDF to grayscale (render pages via canvas, desaturate, re-embed)
-- **Delete Pages** — a simpler, focused version of Organize (just pick pages to remove)
-- **Extract Pages** — pull specific pages into a new PDF (overlaps with Split but is a common standalone tool)
-- **Repair PDF** — attempt to re-save a corrupted PDF by parsing and re-serializing with `pdf-lib`
+### Editing (4 new)
+| Tool | How it works (browser-only) |
+|---|---|
+| **Redact PDF** | Let users draw black rectangles over sensitive content, burn them into the page via canvas re-render + `pdf-lib` embed |
+| **Add Bookmarks** | Let users define named bookmarks (outline entries) and save them into the PDF outline tree via `pdf-lib` |
+| **PDF Annotate** | Add highlight boxes, text notes, and arrows — rendered as overlays and burned into pages |
+| **Reverse PDF** | Simple — reverse page order using `pdf-lib` `copyPages` |
 
-**Image tools:**
-- **Resize Images** — resize images before/independently of PDF conversion
-- **Compress Images** — reduce image file size using canvas quality settings
+### Image Tools (2 new)
+| Tool | How it works (browser-only) |
+|---|---|
+| **Convert Image Format** | Load image to canvas, export as PNG/JPG/WEBP — simple `canvas.toBlob` with format option |
+| **Crop Image** | Draw a crop rectangle on canvas, export the cropped region |
 
----
-
-### 2. UX & Design Improvements
-
-- **Dark mode toggle** — a theme switcher in the navbar (using `next-themes` which is already installed)
-- **Batch processing indicator** — progress bars for multi-file operations
-- **Recent files / history** — store recent operations in localStorage so users can quickly re-download
-- **Drag-and-drop reorder** — proper drag reordering in Merge and Organize tools (currently just buttons)
-- **PDF preview panel** — show a thumbnail preview of uploaded PDFs on every tool page using `pdfjs-dist`
-- **Keyboard shortcuts** — Ctrl+O to open, Ctrl+S to save/download
-- **Toast notifications** — better success/error feedback (already have Sonner installed)
-- **Mobile optimization** — ensure every tool works well on small screens
-- **Tool search** — a search/filter bar on the homepage to quickly find tools
+### Utility (2 new)
+| Tool | How it works (browser-only) |
+|---|---|
+| **Compare PDFs** | Render two PDFs page-by-page to canvas, pixel-diff them, highlight changes in red overlay |
+| **PDF Page Size** | Analyze and display dimensions of each page, with option to resize/standardize all pages to A4/Letter/etc. |
 
 ---
 
-### 3. SEO & Marketing Improvements
+## Also: Homepage & UX Improvements (from approved plan)
 
-- **Individual tool SEO** — each tool page should have its own `<title>`, `<meta description>`, and structured data (currently only the homepage has meta tags)
-- **FAQ section** — add an FAQ accordion on the homepage answering common questions ("Is it really free?", "Are my files safe?", etc.) — great for SEO
-- **Sitemap** — generate a `sitemap.xml` for all tool routes
-- **Canonical URLs** — add canonical link tags
-- **Performance (Core Web Vitals)** — lazy-load tool pages with `React.lazy` + `Suspense` for faster initial load
+These were approved but not yet built:
 
----
-
-### 4. Trust & Community
-
-- **Comparison section** — "Why choose us over iLovePDF?" table highlighting privacy, no uploads, open source
-- **Contributor guide link** — prominent "Contribute" CTA on homepage
-- **Star count badge** — show GitHub stars dynamically
-- **PWA support** — add a `manifest.json` and service worker so the app can be installed and truly works offline
+1. **Category filter tabs** — `[All] [Edit] [Convert] [Security] [Images]` above the tool grid
+2. **"How It Works" section** — 3-step visual explainer
+3. **PWA manifest** — `manifest.json` + service worker registration for offline install
+4. **Community section** — "Star on GitHub", "Report Bug", "Request Feature" links
+5. **Footer update** — list all tools organized by category
+6. **SEO fix** — update meta tags from "16 tools" to correct count
 
 ---
 
-## Recommended Priority (what to build now)
+## Dependencies Needed
 
-I'd recommend implementing these in this order:
+- `xlsx` (SheetJS) — for Excel parsing (Excel to PDF tool)
+- `mammoth` — for Word-to-HTML conversion (Word to PDF tool)
+- No other new dependencies; everything else uses existing `pdf-lib`, `pdfjs-dist`, and canvas APIs
 
-1. **Dark mode toggle** — quick win, already have `next-themes`
-2. **Tool search on homepage** — filter the 16+ tools instantly
-3. **Per-page SEO** — dynamic `<title>` and meta tags via `react-helmet-async`
-4. **FAQ section** — accordion on homepage for SEO juice
-5. **PDF preview on all tool pages** — thumbnail rendering using pdfjs
-6. **New tools: Crop PDF, Flatten PDF, Grayscale PDF, PDF to CSV** — 4 more tools to close the gap
-7. **PWA support** — manifest + service worker for true offline use
-8. **Comparison section** — marketing content to convert visitors
+---
 
-### Technical Details
+## Implementation Order
 
-- Dark mode: use `next-themes` `ThemeProvider`, add a `Moon/Sun` toggle button in `Navbar.tsx`
-- Tool search: a simple `useState` filter on the tools array in `Index.tsx`
-- Per-page SEO: install `react-helmet-async`, wrap app in `HelmetProvider`, add `<Helmet>` to each tool page
-- FAQ: use the existing `Accordion` component from shadcn/ui
-- PDF preview: create a shared `PdfThumbnail` component using `pdfjs-dist` canvas rendering
-- Crop PDF: render page to canvas for visual crop selection, then modify `CropBox` in `pdf-lib`
-- PWA: add `vite-plugin-pwa` for automatic service worker generation
+**Phase 1 — Quick wins (simple tools):**
+Reverse PDF, Convert Image Format, Crop Image, PDF to JSON, PDF Page Size
 
-Would you like me to implement all of these, or would you prefer to pick specific items?
+**Phase 2 — Medium complexity:**
+Redact PDF, Add Bookmarks, PDF to HTML, Compare PDFs
+
+**Phase 3 — Heavier tools:**
+Excel to PDF (needs `xlsx`), Word to PDF (needs `mammoth`), PDF Annotate
+
+**Phase 4 — UX & community:**
+Category tabs, How It Works, PWA, footer update, SEO fixes
+
+This brings the total to **38 free browser-based tools** — more than iLovePDF's free tier offers.
 
