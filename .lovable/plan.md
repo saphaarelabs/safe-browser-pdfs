@@ -1,77 +1,96 @@
 
 
-# More Tools to Add — Closing Every Gap
+# Plan: Expand to 50+ Tools with Performance & UX Upgrades
 
-You currently have **26 tools**. Here's what's still missing compared to iLovePDF, Smallpdf, Adobe Acrobat Online, and PDF24 — all implementable 100% in the browser.
+## Current State
+38 tools across Edit, Convert, Security, Image, and Utility categories. All browser-based with pdf-lib, pdfjs-dist, xlsx, mammoth. Homepage has category tabs, search, FAQ, comparison table, dark mode.
 
 ---
 
-## New Tools to Add (12 more → 38 total)
+## New Tools to Add (12 more, reaching 50 total)
 
-### Conversion (4 new)
-| Tool | How it works (browser-only) |
-|---|---|
-| **PDF to JSON** | Extract text via `pdfjs-dist`, output structured JSON with page/paragraph grouping |
-| **PDF to HTML** | Extract text + positions via `pdfjs-dist`, generate semantic HTML with basic layout |
-| **Excel to PDF** | Parse `.xlsx` with SheetJS (`xlsx` package), render table to canvas/HTML, convert to PDF via `pdf-lib` |
-| **Word to PDF** | Parse `.docx` with `mammoth.js`, render HTML, print to PDF via browser pipeline |
+### PDF Tools (7 new)
 
-### Editing (4 new)
-| Tool | How it works (browser-only) |
-|---|---|
-| **Redact PDF** | Let users draw black rectangles over sensitive content, burn them into the page via canvas re-render + `pdf-lib` embed |
-| **Add Bookmarks** | Let users define named bookmarks (outline entries) and save them into the PDF outline tree via `pdf-lib` |
-| **PDF Annotate** | Add highlight boxes, text notes, and arrows — rendered as overlays and burned into pages |
-| **Reverse PDF** | Simple — reverse page order using `pdf-lib` `copyPages` |
+| Tool | Route | How it works |
+|---|---|---|
+| **PDF to Markdown** | `/pdf-to-markdown` | Extract text via pdfjs-dist, convert headings/paragraphs to markdown syntax |
+| **Markdown to PDF** | `/markdown-to-pdf` | Parse markdown to HTML, open print dialog for save-as-PDF (like HTML to PDF) |
+| **Add Header/Footer** | `/header-footer` | Add custom text to top/bottom of every page via pdf-lib drawText |
+| **PDF to XML** | `/pdf-to-xml` | Extract text via pdfjs-dist, output structured XML with page/paragraph tags |
+| **Duplicate PDF** | `/duplicate-pages` | Duplicate specific pages N times within the same PDF via pdf-lib copyPages |
+| **Add QR Code** | `/add-qr-code` | Generate QR code on canvas from user text/URL, embed as image on PDF pages via pdf-lib embedPng |
+| **PDF to TIFF** | `/pdf-to-tiff` | Render pages via pdfjs canvas, export as TIFF-compatible PNG downloads (bundled in ZIP) |
 
-### Image Tools (2 new)
-| Tool | How it works (browser-only) |
-|---|---|
-| **Convert Image Format** | Load image to canvas, export as PNG/JPG/WEBP — simple `canvas.toBlob` with format option |
-| **Crop Image** | Draw a crop rectangle on canvas, export the cropped region |
+### Image Tools (3 new)
+
+| Tool | Route | How it works |
+|---|---|---|
+| **Rotate Image** | `/rotate-image` | Load to canvas, rotate 90/180/270 degrees, export |
+| **Flip Image** | `/flip-image` | Load to canvas, flip horizontal/vertical via scale(-1,1) or scale(1,-1), export |
+| **Image to Base64** | `/image-to-base64` | Read file as data URL, display base64 string for copying |
 
 ### Utility (2 new)
-| Tool | How it works (browser-only) |
-|---|---|
-| **Compare PDFs** | Render two PDFs page-by-page to canvas, pixel-diff them, highlight changes in red overlay |
-| **PDF Page Size** | Analyze and display dimensions of each page, with option to resize/standardize all pages to A4/Letter/etc. |
+
+| Tool | Route | How it works |
+|---|---|---|
+| **Batch Process** | `/batch` | Upload multiple PDFs, apply a single operation (compress/rotate/grayscale) to all at once, download as ZIP |
+| **PDF Diff (Text)** | `/pdf-diff` | Extract text from two PDFs, show side-by-side text diff with highlighted additions/deletions |
 
 ---
 
-## Also: Homepage & UX Improvements (from approved plan)
+## Performance & UX Upgrades
 
-These were approved but not yet built:
+### 1. Navbar Update
+- Add the 12 new tools to the `moreTools` array in `Navbar.tsx` so they appear in the "More" dropdown and mobile menu.
 
-1. **Category filter tabs** — `[All] [Edit] [Convert] [Security] [Images]` above the tool grid
-2. **"How It Works" section** — 3-step visual explainer
-3. **PWA manifest** — `manifest.json` + service worker registration for offline install
-4. **Community section** — "Star on GitHub", "Report Bug", "Request Feature" links
-5. **Footer update** — list all tools organized by category
-6. **SEO fix** — update meta tags from "16 tools" to correct count
+### 2. Homepage Updates (`Index.tsx`)
+- Add all 12 new tools to the `tools` array with proper categories
+- Update hero subtitle count from "38" to "50"
+- Update "How It Works" step 1 text to say "50 free tools"
+
+### 3. Footer Update (`Footer.tsx`)
+- Add all 12 new tools to the appropriate footer sections
+- Update the "38 free" text to "50 free"
+
+### 4. SEO Updates
+- Update `index.html` meta tags and JSON-LD to reference 50 tools
+- Add new routes to `public/sitemap.xml`
+- Update `document.title` in `Index.tsx`
+
+### 5. App Router (`App.tsx`)
+- Add lazy imports and Route entries for all 12 new pages
 
 ---
 
-## Dependencies Needed
+## Technical Details
 
-- `xlsx` (SheetJS) — for Excel parsing (Excel to PDF tool)
-- `mammoth` — for Word-to-HTML conversion (Word to PDF tool)
-- No other new dependencies; everything else uses existing `pdf-lib`, `pdfjs-dist`, and canvas APIs
+### Dependencies
+- **No new dependencies needed.** QR code generation uses canvas drawing (simple black/white grid). All other tools use existing pdf-lib, pdfjs-dist, jszip, and canvas APIs.
 
----
+### File Changes Summary
 
-## Implementation Order
+**New files (12 tool pages):**
+- `src/pages/PdfToMarkdownPage.tsx`
+- `src/pages/MarkdownToPdfPage.tsx`
+- `src/pages/HeaderFooterPage.tsx`
+- `src/pages/PdfToXmlPage.tsx`
+- `src/pages/DuplicatePagesPage.tsx`
+- `src/pages/AddQrCodePage.tsx`
+- `src/pages/PdfToTiffPage.tsx`
+- `src/pages/RotateImagePage.tsx`
+- `src/pages/FlipImagePage.tsx`
+- `src/pages/ImageToBase64Page.tsx`
+- `src/pages/BatchProcessPage.tsx`
+- `src/pages/PdfDiffPage.tsx`
 
-**Phase 1 — Quick wins (simple tools):**
-Reverse PDF, Convert Image Format, Crop Image, PDF to JSON, PDF Page Size
+**Modified files:**
+- `src/App.tsx` — 12 new lazy imports + routes
+- `src/pages/Index.tsx` — 12 new tool entries, updated count
+- `src/components/Navbar.tsx` — add new tools to moreTools array
+- `src/components/Footer.tsx` — add new tools to footer sections, update count
+- `index.html` — update meta/JSON-LD to "50 tools"
+- `public/sitemap.xml` — 12 new route entries
 
-**Phase 2 — Medium complexity:**
-Redact PDF, Add Bookmarks, PDF to HTML, Compare PDFs
-
-**Phase 3 — Heavier tools:**
-Excel to PDF (needs `xlsx`), Word to PDF (needs `mammoth`), PDF Annotate
-
-**Phase 4 — UX & community:**
-Category tabs, How It Works, PWA, footer update, SEO fixes
-
-This brings the total to **38 free browser-based tools** — more than iLovePDF's free tier offers.
+### Implementation Pattern
+Each new tool follows the established pattern: FileDropZone for upload, processing with existing libraries, download via Blob + anchor click or saveAs. All use `ToolPageLayout` wrapper for consistent SEO and UI.
 
