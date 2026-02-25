@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://safe-browser-pdfs.lovable.app/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://safe-browser-pdfs.lovable.app/merge</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://safe-browser-pdfs.lovable.app/split</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://safe-browser-pdfs.lovable.app/compress</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://safe-browser-pdfs.lovable.app/pdf-to-images</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://safe-browser-pdfs.lovable.app/images-to-pdf</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://safe-browser-pdfs.lovable.app/rotate</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://safe-browser-pdfs.lovable.app/watermark</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://safe-browser-pdfs.lovable.app/page-numbers</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://safe-browser-pdfs.lovable.app/protect</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://safe-browser-pdfs.lovable.app/unlock</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://safe-browser-pdfs.lovable.app/organize</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://safe-browser-pdfs.lovable.app/edit-metadata</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://safe-browser-pdfs.lovable.app/sign</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://safe-browser-pdfs.lovable.app/pdf-to-word</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://safe-browser-pdfs.lovable.app/pdf-to-ppt</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://safe-browser-pdfs.lovable.app/pdf-to-text</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://safe-browser-pdfs.lovable.app/crop</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://safe-browser-pdfs.lovable.app/flatten</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://safe-browser-pdfs.lovable.app/grayscale</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://safe-browser-pdfs.lovable.app/pdf-to-csv</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://safe-browser-pdfs.lovable.app/delete-pages</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://safe-browser-pdfs.lovable.app/extract-pages</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://safe-browser-pdfs.lovable.app/repair</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://safe-browser-pdfs.lovable.app/html-to-pdf</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://safe-browser-pdfs.lovable.app/resize-images</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://safe-browser-pdfs.lovable.app/compress-images</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+</urlset>
