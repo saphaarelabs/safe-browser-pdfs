@@ -1,5 +1,5 @@
 import { useCallback, useState, useRef } from "react";
-import { Upload } from "lucide-react";
+import { Upload, Camera } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface FileDropZoneProps {
@@ -21,6 +21,7 @@ const FileDropZone = ({
 }: FileDropZoneProps) => {
   const [dragging, setDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const isImageAccept = accept.includes("image") || accept.match(/\.(png|jpg|jpeg|webp|gif|bmp)/);
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
@@ -50,18 +51,23 @@ const FileDropZone = ({
       onDrop={handleDrop}
       onClick={() => inputRef.current?.click()}
       className={cn(
-        "relative flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed px-6 py-16 text-center transition-colors",
+        "relative flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed px-6 py-16 text-center transition-colors min-h-[120px]",
         dragging
           ? "border-foreground/30 bg-secondary"
           : "border-border hover:border-foreground/20 hover:bg-secondary/50",
         className
       )}
     >
-      <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-secondary text-muted-foreground">
-        <Upload className="h-5 w-5" />
+      <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-secondary text-muted-foreground">
+        <Upload className="h-6 w-6" />
       </div>
       <p className="text-sm font-medium">{dragging ? "Drop it!" : label}</p>
       <p className="mt-1 text-xs text-muted-foreground">{sublabel}</p>
+      {isImageAccept && (
+        <p className="mt-2 text-[10px] text-muted-foreground flex items-center gap-1">
+          <Camera className="h-3 w-3" /> Camera capture supported on mobile
+        </p>
+      )}
       <input
         ref={inputRef}
         type="file"
@@ -69,6 +75,7 @@ const FileDropZone = ({
         multiple={multiple}
         onChange={handleChange}
         className="hidden"
+        capture={isImageAccept ? "environment" : undefined}
       />
     </div>
   );
