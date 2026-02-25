@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 
@@ -18,15 +19,20 @@ const ToolPageLayout = ({ title, description, accentColor, icon, children }: Too
     <main className="flex-1">
       <div className="container mx-auto max-w-4xl px-4 py-8">
         <Link to="/">
-          <Button variant="ghost" size="sm" className="mb-6 gap-2">
-            <ArrowLeft className="h-4 w-4" /> Back to all tools
+          <Button variant="ghost" size="sm" className="mb-6 gap-2 text-muted-foreground hover:text-foreground">
+            <ArrowLeft className="h-4 w-4" /> All tools
           </Button>
         </Link>
 
-        <div className="mb-8 flex items-center gap-4">
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="mb-8 flex items-center gap-4"
+        >
           <div
-            className="flex h-14 w-14 items-center justify-center rounded-2xl text-white"
-            style={{ backgroundColor: accentColor }}
+            className="flex h-14 w-14 items-center justify-center rounded-2xl text-primary-foreground shadow-lg"
+            style={{ backgroundColor: accentColor, boxShadow: `0 8px 24px -4px ${accentColor}40` }}
           >
             {icon}
           </div>
@@ -34,11 +40,18 @@ const ToolPageLayout = ({ title, description, accentColor, icon, children }: Too
             <h1 className="font-display text-3xl font-bold">{title}</h1>
             <p className="text-muted-foreground">{description}</p>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="space-y-6">{children}</div>
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+          className="space-y-6"
+        >
+          {children}
+        </motion.div>
 
-        <div className="mt-8 flex items-center justify-center gap-2 text-sm text-muted-foreground">
+        <div className="mt-10 flex items-center justify-center gap-2 text-sm text-muted-foreground">
           <Shield className="h-4 w-4" />
           Your files never leave your browser — all processing happens locally.
         </div>

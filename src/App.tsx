@@ -8,6 +8,11 @@ import MergePage from "./pages/MergePage";
 import SplitPage from "./pages/SplitPage";
 import CompressPage from "./pages/CompressPage";
 import PdfToImagesPage from "./pages/PdfToImagesPage";
+import RotatePage from "./pages/RotatePage";
+import WatermarkPage from "./pages/WatermarkPage";
+import PageNumbersPage from "./pages/PageNumbersPage";
+import ProtectPage from "./pages/ProtectPage";
+import UnlockPage from "./pages/UnlockPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +29,11 @@ const App = () => (
           <Route path="/split" element={<SplitPage />} />
           <Route path="/compress" element={<CompressPage />} />
           <Route path="/pdf-to-images" element={<PdfToImagesPage />} />
+          <Route path="/rotate" element={<RotatePage />} />
+          <Route path="/watermark" element={<WatermarkPage />} />
+          <Route path="/page-numbers" element={<PageNumbersPage />} />
+          <Route path="/protect" element={<ProtectPage />} />
+          <Route path="/unlock" element={<UnlockPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
