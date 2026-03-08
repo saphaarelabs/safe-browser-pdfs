@@ -38,7 +38,7 @@ const tools = [
   { title: "Add Bookmarks", desc: "Add named bookmarks for navigation.", icon: Bookmark, path: "/add-bookmarks", color: "hsl(45, 80%, 45%)", category: "edit" },
   { title: "PDF Annotate", desc: "Highlight and annotate PDF pages.", icon: Highlighter, path: "/annotate", color: "hsl(50, 80%, 45%)", category: "edit" },
   // Security (2)
-  { title: "Protect PDF", desc: "Encrypt your PDF with a password.", icon: Lock, path: "/protect", color: "hsl(0, 72%, 51%)", category: "security" },
+  { title: "Clean PDF", desc: "Re-serialize and strip existing restrictions.", icon: Wrench, path: "/protect", color: "hsl(200, 60%, 50%)", category: "security" },
   { title: "Unlock PDF", desc: "Remove password protection.", icon: Unlock, path: "/unlock", color: "hsl(142, 76%, 36%)", category: "security" },
   // Convert (9)
   { title: "PDF to Images", desc: "Convert PDF pages to PNG or JPG.", icon: Image, path: "/pdf-to-images", color: "hsl(262, 83%, 58%)", category: "convert" },
