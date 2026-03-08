@@ -1,6 +1,7 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { Minimize2, Download } from "lucide-react";
 import { PDFDocument } from "pdf-lib";
+import * as pdfjsLib from "pdfjs-dist";
 import { saveAs } from "file-saver";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,63 +12,85 @@ import ToolPageLayout from "@/components/ToolPageLayout";
 import FileDropZone from "@/components/FileDropZone";
 import { toast } from "sonner";
 
-type Quality = "low" | "medium" | "high";
+pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
-const qualitySettings: Record<Quality, { label: string; scale: number; description: string }> = {
-  low: { label: "Low", scale: 0.5, description: "Smallest file, lower quality" },
-  medium: { label: "Medium", scale: 0.72, description: "Good balance" },
-  high: { label: "High", scale: 0.92, description: "Best quality, larger file" },
+type Quality = "minimum" | "balanced" | "maximum";
+
+const qualitySettings: Record<Quality, { label: string; jpeg: number; scale: number; description: string }> = {
+  minimum: { label: "Minimum Size", jpeg: 0.40, scale: 1, description: "Smallest file — JPEG 40% quality" },
+  balanced: { label: "Balanced", jpeg: 0.65, scale: 1.5, description: "Good balance — JPEG 65% quality" },
+  maximum: { label: "Maximum Quality", jpeg: 0.88, scale: 2, description: "Best quality — JPEG 88%" },
 };
 
 const CompressPage = () => {
   const [file, setFile] = useState<File | null>(null);
-  const [quality, setQuality] = useState<Quality>("medium");
+  const [pageCount, setPageCount] = useState(0);
+  const [quality, setQuality] = useState<Quality>("balanced");
   const [processing, setProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [result, setResult] = useState<{ blob: Blob; size: number } | null>(null);
 
   const handleFiles = useCallback(async (files: File[]) => {
-    setFile(files[0]);
+    const f = files[0];
+    setFile(f);
     setResult(null);
+    try {
+      const buffer = await f.arrayBuffer();
+      const pdf = await PDFDocument.load(buffer, { ignoreEncryption: true });
+      setPageCount(pdf.getPageCount());
+    } catch {
+      toast.error("Could not read PDF.");
+    }
   }, []);
-
-  // Animated progress during processing
-  useEffect(() => {
-    if (!processing) { setProgress(0); return; }
-    let v = 0;
-    const interval = setInterval(() => {
-      v = Math.min(v + Math.random() * 15, 90);
-      setProgress(v);
-    }, 200);
-    return () => clearInterval(interval);
-  }, [processing]);
 
   const handleCompress = async () => {
     if (!file) return;
     setProcessing(true);
     setResult(null);
+    setProgress(0);
     try {
       const buffer = await file.arrayBuffer();
-      const sourcePdf = await PDFDocument.load(buffer, { ignoreEncryption: true });
+      const srcPdf = await pdfjsLib.getDocument({ data: buffer }).promise;
       const newPdf = await PDFDocument.create();
-      const pages = await newPdf.copyPages(sourcePdf, sourcePdf.getPageIndices());
-      pages.forEach((page) => {
-        const { width, height } = page.getSize();
-        const scale = qualitySettings[quality].scale;
-        if (scale < 1) {
-          page.setSize(width * scale, height * scale);
-          page.scaleContent(scale, scale);
-        }
-        newPdf.addPage(page);
-      });
+      const settings = qualitySettings[quality];
+      const totalPages = srcPdf.numPages;
+
+      for (let i = 1; i <= totalPages; i++) {
+        const page = await srcPdf.getPage(i);
+        const viewport = page.getViewport({ scale: settings.scale });
+        const canvas = document.createElement("canvas");
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        const ctx = canvas.getContext("2d")!;
+        await page.render({ canvasContext: ctx, viewport }).promise;
+
+        // Convert to JPEG blob at specified quality
+        const jpegBlob = await new Promise<Blob>((resolve) =>
+          canvas.toBlob((b) => resolve(b!), "image/jpeg", settings.jpeg)
+        );
+        const jpegBytes = new Uint8Array(await jpegBlob.arrayBuffer());
+        const jpegImage = await newPdf.embedJpg(jpegBytes);
+
+        // Get original page dimensions to preserve them
+        const origViewport = page.getViewport({ scale: 1 });
+        const newPage = newPdf.addPage([origViewport.width, origViewport.height]);
+        newPage.drawImage(jpegImage, {
+          x: 0,
+          y: 0,
+          width: origViewport.width,
+          height: origViewport.height,
+        });
+
+        setProgress(Math.round((i / totalPages) * 100));
+      }
+
       const compressedBytes = await newPdf.save();
       const blob = new Blob([compressedBytes as BlobPart], { type: "application/pdf" });
-      setProgress(100);
       setResult({ blob, size: compressedBytes.byteLength });
       toast.success("PDF compressed!");
     } catch (err) {
-      toast.error("Failed to compress PDF.");
       console.error(err);
+      toast.error("Failed to compress PDF.");
     } finally {
       setProcessing(false);
     }
@@ -78,7 +101,7 @@ const CompressPage = () => {
   return (
     <ToolPageLayout
       title="Compress PDF"
-      description="Reduce PDF file size"
+      description="Reduce PDF file size by re-rendering pages as compressed JPEG images"
       accentColor="hsl(30, 90%, 55%)"
       icon={<Minimize2 className="h-5 w-5" />}
     >
@@ -91,7 +114,7 @@ const CompressPage = () => {
               <div>
                 <p className="font-semibold truncate max-w-[200px]">{file.name}</p>
                 <p className="text-sm text-muted-foreground">
-                  Original size: {(file.size / 1024).toFixed(0)} KB
+                  {pageCount} pages · {(file.size / 1024).toFixed(0)} KB
                 </p>
               </div>
               <Button variant="ghost" size="sm" className="min-h-[44px]" onClick={() => { setFile(null); setResult(null); }}>
@@ -103,8 +126,9 @@ const CompressPage = () => {
           <Card>
             <CardContent className="space-y-4 p-6">
               <Label className="font-semibold">Compression Level</Label>
+              <p className="text-xs text-muted-foreground">Each page is rendered to a canvas and re-embedded as a compressed JPEG image. Original page dimensions are preserved.</p>
               <RadioGroup value={quality} onValueChange={(v) => { setQuality(v as Quality); setResult(null); }}>
-                {(Object.entries(qualitySettings) as [Quality, typeof qualitySettings["low"]][]).map(([key, val]) => (
+                {(Object.entries(qualitySettings) as [Quality, typeof qualitySettings["balanced"]][]).map(([key, val]) => (
                   <div key={key} className="flex items-center space-x-2">
                     <RadioGroupItem value={key} id={key} />
                     <Label htmlFor={key}>
@@ -119,7 +143,7 @@ const CompressPage = () => {
           {processing && (
             <div className="space-y-1.5">
               <Progress value={progress} className="h-2.5 transition-all" />
-              <p className="text-xs text-muted-foreground text-center">Compressing… {Math.round(progress)}%</p>
+              <p className="text-xs text-muted-foreground text-center">Rendering page {Math.ceil((progress / 100) * pageCount)} of {pageCount}… {progress}%</p>
             </div>
           )}
 
@@ -138,32 +162,22 @@ const CompressPage = () => {
                 <div className="w-full bg-muted rounded-full h-3 overflow-hidden">
                   <div
                     className="h-full bg-primary rounded-full transition-all duration-700"
-                    style={{ width: `${100 - savedPercent}%` }}
+                    style={{ width: `${Math.max(100 - savedPercent, 5)}%` }}
                   />
                 </div>
                 <p className="text-center text-sm font-medium mt-2 text-primary">
-                  {savedPercent > 0 ? `${savedPercent}% smaller` : "No size reduction (file may already be optimized)"}
+                  {savedPercent > 0 ? `${savedPercent}% smaller` : "File size increased — the original may already be well-optimized"}
                 </p>
               </CardContent>
             </Card>
           )}
 
           <div className="flex gap-3">
-            <Button
-              onClick={handleCompress}
-              disabled={processing}
-              className="flex-1 min-h-[44px]"
-              size="lg"
-            >
-              {processing ? "Compressing…" : "Compress"}
+            <Button onClick={handleCompress} disabled={processing} className="flex-1 min-h-[44px]" size="lg">
+              {processing ? `Compressing… ${progress}%` : "Compress"}
             </Button>
             {result && (
-              <Button
-                onClick={() => saveAs(result.blob, `compressed-${file!.name}`)}
-                size="lg"
-                variant="outline"
-                className="gap-2 min-h-[44px]"
-              >
+              <Button onClick={() => saveAs(result.blob, `compressed-${file!.name}`)} size="lg" variant="outline" className="gap-2 min-h-[44px]">
                 <Download className="h-4 w-4" /> Download
               </Button>
             )}
