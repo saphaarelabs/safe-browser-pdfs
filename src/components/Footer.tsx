@@ -49,7 +49,7 @@ const footerSections = [
       { name: "PDF to Markdown", path: "/pdf-to-markdown" },
       { name: "Markdown to PDF", path: "/markdown-to-pdf" },
       { name: "PDF to XML", path: "/pdf-to-xml" },
-      { name: "PDF to TIFF", path: "/pdf-to-tiff" },
+      { name: "PDF to Images (ZIP)", path: "/pdf-to-tiff" },
       { name: "PDF to Excel", path: "/pdf-to-excel" },
     ],
   },

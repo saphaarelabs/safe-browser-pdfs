@@ -58,7 +58,7 @@ const moreTools = [
   { name: "PDF to XML", path: "/pdf-to-xml" },
   { name: "Duplicate Pages", path: "/duplicate-pages" },
   { name: "Add QR Code", path: "/add-qr-code" },
-  { name: "PDF to TIFF", path: "/pdf-to-tiff" },
+  { name: "PDF to Images (ZIP)", path: "/pdf-to-tiff" },
   { name: "Rotate Image", path: "/rotate-image" },
   { name: "Flip Image", path: "/flip-image" },
   { name: "Image to Base64", path: "/image-to-base64" },

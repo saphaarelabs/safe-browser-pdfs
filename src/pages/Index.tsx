@@ -67,7 +67,7 @@ const tools = [
   { title: "PDF to XML", desc: "Extract PDF text into structured XML.", icon: Code, path: "/pdf-to-xml", color: "hsl(30, 70%, 50%)", category: "convert" },
   { title: "Duplicate Pages", desc: "Duplicate specific pages N times.", icon: Layers, path: "/duplicate-pages", color: "hsl(280, 60%, 55%)", category: "edit" },
   { title: "Add QR Code", desc: "Embed a QR code on every PDF page.", icon: Hash, path: "/add-qr-code", color: "hsl(200, 65%, 50%)", category: "edit" },
-  { title: "PDF to TIFF", desc: "Convert PDF pages to images in a ZIP.", icon: Image, path: "/pdf-to-tiff", color: "hsl(310, 55%, 50%)", category: "convert" },
+  { title: "PDF to Images (ZIP)", desc: "Convert PDF pages to PNG images in a ZIP.", icon: Image, path: "/pdf-to-tiff", color: "hsl(310, 55%, 50%)", category: "convert" },
   { title: "Rotate Image", desc: "Rotate images by 90°, 180°, or 270°.", icon: RotateCw, path: "/rotate-image", color: "hsl(340, 65%, 55%)", category: "image" },
   { title: "Flip Image", desc: "Flip images horizontally or vertically.", icon: ImageIcon, path: "/flip-image", color: "hsl(190, 60%, 50%)", category: "image" },
   { title: "Image to Base64", desc: "Convert images to Base64-encoded strings.", icon: Code2, path: "/image-to-base64", color: "hsl(270, 55%, 55%)", category: "image" },
