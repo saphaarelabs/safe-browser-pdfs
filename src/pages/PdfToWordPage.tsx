@@ -6,10 +6,8 @@ import ToolPageLayout from "@/components/ToolPageLayout";
 import FileDropZone from "@/components/FileDropZone";
 import { Document, Paragraph, TextRun, Packer } from "docx";
 import { saveAs } from "file-saver";
-import * as pdfjsLib from "pdfjs-dist";
+import { pdfjsLib } from "@/lib/pdfjs";
 import { toast } from "sonner";
-
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 const PdfToWordPage = () => {
   const [file, setFile] = useState<File | null>(null);

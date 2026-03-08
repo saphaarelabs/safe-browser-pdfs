@@ -34,8 +34,10 @@ interface Block { type: "h1" | "h2" | "p" | "li"; text: string; }
 
 function htmlToBlocks(html: string): Block[] {
   const blocks: Block[] = [];
-  const div = document.createElement("div");
-  div.innerHTML = html;
+  // Use DOMParser to avoid innerHTML resource-loading side effects (XSS mitigation)
+  const parser = new DOMParser();
+  const parsed = parser.parseFromString(html, "text/html");
+  const div = parsed.body ?? parsed.documentElement;
 
   function walk(el: Element) {
     const tag = el.tagName?.toLowerCase();
@@ -53,9 +55,7 @@ function htmlToBlocks(html: string): Block[] {
       }
     }
   }
-  // Try to parse body content first
-  const body = div.querySelector("body");
-  const root = body || div;
+  const root = div;
   for (const child of Array.from(root.children)) walk(child);
   if (blocks.length === 0 && root.textContent?.trim()) {
     blocks.push({ type: "p", text: root.textContent.trim() });

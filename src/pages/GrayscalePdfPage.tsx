@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { Palette, Download } from "lucide-react";
 import { PDFDocument } from "pdf-lib";
-import * as pdfjsLib from "pdfjs-dist";
+import { pdfjsLib } from "@/lib/pdfjs";
 import { saveAs } from "file-saver";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,8 +9,6 @@ import { Progress } from "@/components/ui/progress";
 import ToolPageLayout from "@/components/ToolPageLayout";
 import FileDropZone from "@/components/FileDropZone";
 import { toast } from "sonner";
-
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 const GrayscalePdfPage = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -47,11 +45,15 @@ const GrayscalePdfPage = () => {
         }
         ctx.putImageData(imageData, 0, 0);
 
-        const jpgDataUrl = canvas.toDataURL("image/jpeg", 0.9);
-        const jpgBytes = Uint8Array.from(atob(jpgDataUrl.split(",")[1]), (c) => c.charCodeAt(0));
+        // Get original page dimensions to preserve them
+        const origViewport = page.getViewport({ scale: 1 });
+        const jpegBlob = await new Promise<Blob>((resolve) =>
+          canvas.toBlob((b) => resolve(b!), "image/jpeg", 0.9)
+        );
+        const jpgBytes = new Uint8Array(await jpegBlob.arrayBuffer());
         const img = await newPdf.embedJpg(jpgBytes);
-        const pdfPage = newPdf.addPage([viewport.width / 2, viewport.height / 2]);
-        pdfPage.drawImage(img, { x: 0, y: 0, width: viewport.width / 2, height: viewport.height / 2 });
+        const pdfPage = newPdf.addPage([origViewport.width, origViewport.height]);
+        pdfPage.drawImage(img, { x: 0, y: 0, width: origViewport.width, height: origViewport.height });
         setProgress(Math.round((i / pdfDoc.numPages) * 100));
       }
 

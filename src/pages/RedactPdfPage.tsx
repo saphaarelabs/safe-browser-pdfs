@@ -1,13 +1,11 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { EyeOff, Undo2, ChevronLeft, ChevronRight } from "lucide-react";
 import { PDFDocument } from "pdf-lib";
-import * as pdfjsLib from "pdfjs-dist";
+import { pdfjsLib } from "@/lib/pdfjs";
 import ToolPageLayout from "@/components/ToolPageLayout";
 import FileDropZone from "@/components/FileDropZone";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 interface Rect { x: number; y: number; w: number; h: number; }
 

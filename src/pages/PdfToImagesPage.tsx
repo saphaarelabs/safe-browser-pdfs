@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { Image as ImageIcon, Download } from "lucide-react";
-import * as pdfjsLib from "pdfjs-dist";
+import { pdfjsLib } from "@/lib/pdfjs";
 import { saveAs } from "file-saver";
 import JSZip from "jszip";
 import { Button } from "@/components/ui/button";
@@ -12,8 +12,6 @@ import { Progress } from "@/components/ui/progress";
 import ToolPageLayout from "@/components/ToolPageLayout";
 import FileDropZone from "@/components/FileDropZone";
 import { toast } from "sonner";
-
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`;
 
 type Format = "png" | "jpeg";
 
