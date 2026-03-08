@@ -55,7 +55,7 @@ const PdfToTiffPage = () => {
       a.download = file.name.replace(".pdf", "-images.zip");
       a.click();
       URL.revokeObjectURL(a.href);
-      toast.success(`${pdf.numPages} pages converted!`);
+      toast.success(`${pdf.numPages} pages converted to PNG images!`);
     } catch (e) {
       console.error(e);
       toast.error("Failed to convert.");
@@ -65,7 +65,7 @@ const PdfToTiffPage = () => {
   };
 
   return (
-    <ToolPageLayout title="PDF to TIFF" description="Convert PDF pages to high-quality images bundled in a ZIP." accentColor="hsl(310, 55%, 50%)" icon={<Image className="h-5 w-5" />}>
+    <ToolPageLayout title="PDF to Images (ZIP)" description="Convert PDF pages to high-quality PNG images bundled in a ZIP file." accentColor="hsl(310, 55%, 50%)" icon={<Image className="h-5 w-5" />}>
       {!file ? (
         <FileDropZone onFiles={handleFiles} accept=".pdf" label="Drop a PDF here" />
       ) : (
@@ -74,7 +74,7 @@ const PdfToTiffPage = () => {
             <CardContent className="p-6">
               <p className="font-semibold">{file.name}</p>
               <p className="text-sm text-muted-foreground">{pageCount} pages · {(file.size / 1024).toFixed(0)} KB</p>
-              <p className="text-xs text-muted-foreground mt-1">Pages rendered at 2× scale as high-quality PNGs.</p>
+              <p className="text-xs text-muted-foreground mt-1">Pages rendered at 2× scale as high-quality PNG images.</p>
               <Button variant="ghost" size="sm" className="mt-2" onClick={() => setFile(null)}>Choose different file</Button>
             </CardContent>
           </Card>

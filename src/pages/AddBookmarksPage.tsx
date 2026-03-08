@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Bookmark, Download, Plus, X } from "lucide-react";
-import { PDFDocument } from "pdf-lib";
+import { PDFDocument, PDFDict, PDFName, PDFString, PDFArray, PDFRef, PDFNull } from "pdf-lib";
 import ToolPageLayout from "@/components/ToolPageLayout";
 import FileDropZone from "@/components/FileDropZone";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,55 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
 interface BookmarkEntry { title: string; page: number; }
+
+function addOutlineToDoc(pdf: PDFDocument, bookmarks: BookmarkEntry[]) {
+  const context = pdf.context;
+  const pages = pdf.getPages();
+
+  // Create outline items
+  const itemRefs: PDFRef[] = [];
+  const itemDicts: PDFDict[] = [];
+
+  for (const bm of bookmarks) {
+    const pageIndex = Math.min(bm.page - 1, pages.length - 1);
+    const pageRef = pages[pageIndex].ref;
+
+    const itemDict = context.obj({});
+    itemDict.set(PDFName.of("Title"), PDFString.of(bm.title));
+    // Destination: [page /Fit]
+    const dest = PDFArray.withContext(context);
+    dest.push(pageRef);
+    dest.push(PDFName.of("Fit"));
+    itemDict.set(PDFName.of("Dest"), dest);
+
+    const itemRef = context.register(itemDict);
+    itemRefs.push(itemRef);
+    itemDicts.push(itemDict);
+  }
+
+  // Link items as a doubly-linked list
+  for (let i = 0; i < itemDicts.length; i++) {
+    if (i > 0) itemDicts[i].set(PDFName.of("Prev"), itemRefs[i - 1]);
+    if (i < itemDicts.length - 1) itemDicts[i].set(PDFName.of("Next"), itemRefs[i + 1]);
+  }
+
+  // Create outline dictionary
+  const outlineDict = context.obj({});
+  outlineDict.set(PDFName.of("Type"), PDFName.of("Outlines"));
+  outlineDict.set(PDFName.of("First"), itemRefs[0]);
+  outlineDict.set(PDFName.of("Last"), itemRefs[itemRefs.length - 1]);
+  outlineDict.set(PDFName.of("Count"), context.obj(bookmarks.length));
+  const outlineRef = context.register(outlineDict);
+
+  // Set parent on all items
+  for (const itemDict of itemDicts) {
+    itemDict.set(PDFName.of("Parent"), outlineRef);
+  }
+
+  // Set Outlines on catalog
+  const catalog = pdf.catalog;
+  catalog.set(PDFName.of("Outlines"), outlineRef);
+}
 
 const AddBookmarksPage = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -41,9 +90,7 @@ const AddBookmarksPage = () => {
       const bytes = await file.arrayBuffer();
       const pdf = await PDFDocument.load(bytes);
 
-      // Store bookmarks as structured data in metadata
-      pdf.setKeywords(validBookmarks.map((b) => `${b.title}:p${b.page}`));
-      pdf.setSubject(`Bookmarks: ${validBookmarks.map((b) => `${b.title} (p${b.page})`).join(", ")}`);
+      addOutlineToDoc(pdf, validBookmarks);
 
       const out = await pdf.save();
       const blob = new Blob([out as BlobPart], { type: "application/pdf" });
@@ -52,7 +99,7 @@ const AddBookmarksPage = () => {
       a.download = file.name.replace(".pdf", "-bookmarked.pdf");
       a.click();
       URL.revokeObjectURL(a.href);
-      toast.success(`${validBookmarks.length} bookmark(s) saved to metadata!`);
+      toast.success(`${validBookmarks.length} bookmark(s) added! Open in a PDF reader to see them in the sidebar.`);
     } catch (e) {
       console.error(e);
       toast.error("Failed to save bookmarks.");
@@ -64,12 +111,12 @@ const AddBookmarksPage = () => {
   const updateBookmark = (i: number, field: "title" | "page", value: string | number) => {
     const copy = [...bookmarks];
     if (field === "title") copy[i].title = value as string;
-    else copy[i].page = Math.max(1, Math.min(value as number, pageCount));
+    else copy[i].page = Math.max(1, Math.min(value as number, pageCount || 9999));
     setBookmarks(copy);
   };
 
   return (
-    <ToolPageLayout title="Add Bookmarks" description="Add named bookmarks to your PDF for easy navigation." accentColor="hsl(45, 80%, 45%)" icon={<Bookmark className="h-5 w-5" />}>
+    <ToolPageLayout title="Add Bookmarks" description="Add real PDF outline bookmarks visible in any PDF reader's sidebar." accentColor="hsl(45, 80%, 45%)" icon={<Bookmark className="h-5 w-5" />}>
       {!file ? (
         <FileDropZone onFiles={handleFile} accept=".pdf" label="Drop a PDF here" />
       ) : (
@@ -85,7 +132,7 @@ const AddBookmarksPage = () => {
           <Card>
             <CardContent className="p-6 space-y-3">
               <Label className="font-semibold">Bookmarks</Label>
-              <p className="text-xs text-muted-foreground">Bookmark data is stored in PDF metadata (keywords/subject). For true outline bookmarks, a server-side library is needed.</p>
+              <p className="text-xs text-muted-foreground">These create real PDF outline entries — they'll appear in the bookmark panel of any PDF reader (Adobe, Preview, Chrome, etc.).</p>
               {bookmarks.map((b, i) => (
                 <div key={i} className="flex gap-2 items-end">
                   <div className="flex-1">
