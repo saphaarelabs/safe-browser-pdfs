@@ -55,9 +55,7 @@ function htmlToBlocks(html: string): Block[] {
       }
     }
   }
-  // Try to parse body content first
-  const body = div.querySelector("body");
-  const root = body || div;
+  const root = div;
   for (const child of Array.from(root.children)) walk(child);
   if (blocks.length === 0 && root.textContent?.trim()) {
     blocks.push({ type: "p", text: root.textContent.trim() });
