@@ -66,7 +66,7 @@ const footerSections = [
       { name: "Flip Image", path: "/flip-image" },
       { name: "Image to Base64", path: "/image-to-base64" },
       { name: "Merge Images", path: "/merge-images" },
-      { name: "Protect PDF", path: "/protect" },
+      { name: "Clean PDF", path: "/protect" },
       { name: "Unlock PDF", path: "/unlock" },
       { name: "Batch Process", path: "/batch" },
       { name: "PDF Diff", path: "/pdf-diff" },
