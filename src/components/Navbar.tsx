@@ -29,7 +29,7 @@ const moreTools = [
   { name: "PDF to PowerPoint", path: "/pdf-to-ppt" },
   { name: "PDF to Text", path: "/pdf-to-text" },
   { name: "PDF to CSV", path: "/pdf-to-csv" },
-  { name: "Protect PDF", path: "/protect" },
+  { name: "Clean PDF", path: "/protect" },
   { name: "Unlock PDF", path: "/unlock" },
   { name: "Crop PDF", path: "/crop" },
   { name: "Flatten PDF", path: "/flatten" },
